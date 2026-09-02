@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>모바일 미리보기 | 무료 보험 보장분석</title>
+    <link rel="stylesheet" href="./app/globals.css" />
+  </head>
+  <body>
+    <div class="mobile-page">
+      <header class="topbar">
+        <div class="wrap topbar-inner">
+          <a class="brand" href="./preview.html">
+            <strong class="brand-main">리치앤아이</strong>
+            <span class="brand-sub">리케어</span>
+          </a>
+          <a class="nav-link" href="./preview.html#join">입사문의</a>
+        </div>
+      </header>
+
+      <main class="mobile-main">
+        <p class="eyebrow">MOBILE REVIEW</p>
+        <h1>
+          보험 빈틈,<br />
+          지금 확인해 보세요
+        </h1>
+        <p class="mobile-lead">
+          전화번호 · 생년월일 · 성별만 남기시면<br />
+          상담사가 직접 전화드립니다.
+        </p>
+
+        <ul class="mobile-chips">
+          <li>중복 보장 확인</li>
+          <li>부족한 보장 정리</li>
+          <li>부담 없는 상담</li>
+        </ul>
+
+        <form id="apply" class="card">
+          <h2>무료 보장분석 신청</h2>
+          <p class="sub">남겨 주신 번호로 상담 전화를 드립니다.</p>
+          <div class="field">
+            <label for="phone">전화번호</label>
+            <input id="phone" type="tel" inputmode="numeric" placeholder="010-1234-5678" />
+          </div>
+          <div class="field">
+            <label for="birthDate">생년월일</label>
+            <input id="birthDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="gender">성별</label>
+            <select id="gender">
+              <option value="">선택해 주세요</option>
+              <option value="male">남성</option>
+              <option value="female">여성</option>
+            </select>
+          </div>
+          <label class="consent">
+            <input type="checkbox" />
+            <span>
+              상담을 위해 전화번호, 생년월일, 성별을 수집·이용하는 데 동의합니다.
+            </span>
+          </label>
+          <button type="submit">무료 상담 신청하기</button>
+          <p class="msg" style="color: #5c6170">
+            미리보기입니다. 배포 후 주소는 /(사이트주소)/m 입니다.
+          </p>
+        </form>
+
+        <section class="mobile-why">
+          <h2>이런 때 신청하세요</h2>
+          <article>
+            <strong>보험을 여러 건 들고 있을 때</strong>
+            <p>비슷한 보장이 겹쳐 보험료만 나가고 있을 수 있습니다.</p>
+          </article>
+          <article>
+            <strong>실손·병원비가 걱정될 때</strong>
+            <p>빠진 보장을 기준으로 알기 쉽게 안내드립니다.</p>
+          </article>
+          <article>
+            <strong>내 가족은 어떻게 보상 받을 수 있을까</strong>
+            <p>가족 전체 보상관련 전문적으로 상담 받아 보실 수 있습니다.</p>
+          </article>
+        </section>
+
+        <div class="notice">
+          <h3>개인정보 안내</h3>
+          <p>
+            수집 항목: 전화번호, 생년월일, 성별 / 이용 목적: 보장분석 상담 연락
+            / 신청 정보는 zoocci@naver.com으로 전달됩니다.
+          </p>
+        </div>
+      </main>
+    </div>
+    <script>
+      document.getElementById("bosangDrop").querySelector("button").addEventListener("click", function () {
+        document.getElementById("bosangDrop").classList.toggle("open");
+      });
+      document.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        alert("모바일 미리보기입니다. 배포 후 /m 주소에서 메일이 발송됩니다.");
+      });
+    </script>
+  </body>
+</html>

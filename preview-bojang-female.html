@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>보장분석 | 여성</title>
+    <link rel="stylesheet" href="./app/globals.css" />
+    <style>
+      body::before { background-image: url("./public/hero-bg.png"); }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="./preview.html">
+          <strong class="brand-main">리치앤아이</strong>
+          <span class="brand-sub">리케어</span>
+        </a>
+        <a class="nav-link" href="./preview.html#join">입사문의</a>
+      </div>
+    </header>
+    <main class="section">
+      <div class="wrap inner-page">
+        <p class="eyebrow">보장분석 · 여성</p>
+        <h1>여성 보장분석 자료</h1>
+        <p class="intro">여성 자료를 이 화면에만 따로 올릴 수 있습니다. 미리보기에서는 파일이 저장되지 않습니다.</p>
+        <form class="card" id="uploadForm">
+          <div class="field">
+            <label>파일 선택</label>
+            <input type="file" />
+          </div>
+          <button type="submit">여성 자료 올리기</button>
+        </form>
+      </div>
+    </main>
+    <script>
+      document.getElementById("uploadForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        alert("배포 후 이 화면에서 여성 자료를 올릴 수 있습니다.");
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>미리보기 | 무료 보험 보장분석</title>
+    <link rel="stylesheet" href="./app/globals.css" />
+    <style>
+      body::before {
+        background-image: url("./public/hero-bg.png");
+      }
+    </style>
+  </head>
+  <body>
+    <div class="home-shell">
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="./preview.html">
+          <strong class="brand-main">리치앤아이</strong>
+          <span class="brand-sub">리케어</span>
+        </a>
+        <button type="button" class="nav-btn" id="openJoin">입사문의</button>
+      </div>
+    </header>
+
+      <section class="hero">
+        <div class="wrap hero-split">
+          <div class="hero-col">
+            <div class="status-board">
+              <div class="status-head">
+                <p class="eyebrow">LIVE STATUS</p>
+                <h2>접수 현황</h2>
+                <p>최근 접수된 상담 현황입니다. 번호는 일부만 공개됩니다.</p>
+              </div>
+              <div class="status-scroll">
+                <ul class="status-list" id="statusList"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-col">
+            <article class="inquiry-card" id="inquiry">
+              <h2 class="compare-title">무료 상담 vs 유료 상담</h2>
+              <p class="compare-sub">같은 상담, 결과는 다릅니다</p>
+              <div class="compare-box">
+                <div class="compare-col free">
+                  <h3>무료 보험상담</h3>
+                  <ul>
+                    <li>고객 중심이 아닌 설계사 중심 상담</li>
+                    <li>기존보험 해지 후 새보험 가입 권유</li>
+                    <li>컨설팅이 아닌 상품 가입 권유</li>
+                    <li>상품가입 중심 상담</li>
+                  </ul>
+                </div>
+                <div class="compare-col paid">
+                  <h3>유료 보험상담</h3>
+                  <ul>
+                    <li>고객의 이익을 최우선으로 객관적 분석</li>
+                    <li>필요한 보험과 중복보험 객관적 분석</li>
+                    <li>본인보험 분석 파일 제공</li>
+                    <li>장기적인 재무계획과 연계된 상담</li>
+                  </ul>
+                </div>
+              </div>
+              <p class="compare-foot">
+                중요한 것은 상담료가 아니라,<br />
+                <em class="em-red">잘못된 보험료 지출</em>을 얼마나 줄이고,<br />
+                <em class="em-blue">내 보험을 정확하게 파악하고 있는지</em> 입니다
+              </p>
+              <button type="button" class="inquiry-btn" id="openPay">문의하기</button>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+
+      <div class="modal-back" id="joinModal" hidden>
+        <div class="modal join-modal" role="dialog">
+          <button type="button" class="modal-close" id="closeJoin">닫기</button>
+          <h3>입사문의</h3>
+          <p class="modal-sub">아래 정보를 남겨 주시면 확인 후 연락드립니다.</p>
+          <form class="join-form" id="joinForm">
+            <div class="field">
+              <label for="join-name">성함</label>
+              <input id="join-name" name="name" type="text" placeholder="홍길동" required />
+            </div>
+            <div class="field">
+              <label for="join-phone">핸드폰번호</label>
+              <input id="join-phone" name="phone" type="tel" placeholder="010-1234-5678" required />
+            </div>
+            <div class="field">
+              <label for="join-birth">생년월일</label>
+              <input id="join-birth" name="birthDate" type="date" required />
+            </div>
+            <div class="field">
+              <label for="join-job">현직업</label>
+              <input id="join-job" name="job" type="text" placeholder="예: 보험설계사, 회사원" required />
+            </div>
+            <label class="consent">
+              <input type="checkbox" name="consent" required />
+              <span>
+                입사 문의 확인을 위해 성함, 핸드폰번호, 생년월일, 현직업을 수집·이용하는 데 동의합니다.
+                <a href="./preview-privacy.html">개인정보처리방침</a>
+              </span>
+            </label>
+            <button type="submit" class="pay-btn">입사문의 보내기</button>
+            <p class="msg ok" id="joinMsg"></p>
+          </form>
+        </div>
+      </div>
+
+      <div class="modal-back" id="payModal" hidden>
+        <div class="modal" role="dialog">
+          <button type="button" class="modal-close" id="closePay">닫기</button>
+          <h3>분석 상담 결제</h3>
+          <p class="modal-sub">원하시는 플랜을 고른 뒤 결제를 진행해 주세요.</p>
+          <div class="plan-grid">
+            <label class="plan on" id="planBasic">
+              <input type="radio" name="plan" value="basic" checked />
+              <strong>베이직</strong>
+              <em>30,000원</em>
+              <ul class="plan-points">
+                <li>보장분석 상담</li>
+                <li>분석 파일 제공</li>
+                <li>보험 분석 후 콜 or 메신저 상담</li>
+              </ul>
+            </label>
+            <label class="plan" id="planPremium">
+              <input type="radio" name="plan" value="premium" />
+              <strong>프리미엄</strong>
+              <em>100,000원</em>
+              <ul class="plan-points">
+                <li>심화분석 + 가족 보험 상담</li>
+                <li>분석 파일 제공(상세내용)</li>
+                <li>보험 분석 후 콜 or 메신저 or <span class="plan-hot">대면 상담</span></li>
+              </ul>
+            </label>
+          </div>
+          <button type="button" class="pay-btn" id="doPay">30,000원 결제하기</button>
+          <p class="msg ok" id="payMsg"></p>
+        </div>
+      </div>
+
+    <main>
+      <section class="reasons">
+        <div class="wrap">
+          <div class="reason-cols">
+            <article>
+              <span class="reason-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="3" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.8" fill="currentColor" fill-opacity="0.18"/></svg>
+              </span>
+              <strong>보장이 겹치는지 궁금할 때</strong>
+              <p>비슷한 특약이 중복되어 보험료만 나가고 있을 수 있습니다.</p>
+            </article>
+            <article>
+              <span class="reason-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.8"/><path d="M8.4 9.1h3.3c1.15 0 2.05.7 2.05 1.75 0 1.05-.9 1.75-2.05 1.75H8.4h4.1c1.2 0 2.15.72 2.15 1.85 0 1.13-.95 1.85-2.15 1.85H8.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 7.6v8.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <strong>병원비·실손 공백이 걱정될 때</strong>
+              <p>실제 필요한 보장과 빠진 부분을 기준으로 안내드립니다.</p>
+            </article>
+            <article>
+              <span class="reason-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="7" r="2.2" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="7.5" r="2" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9.5" r="1.6" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c.4-3 2.4-5 4.5-5s4.1 2 4.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12.5 19c.3-2.4 1.8-4 3.5-4s3.3 1.6 3.5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <strong>내 가족은 어떻게 보상 받을 수 있을까</strong>
+              <p>가족 전체 보상관련 전문적으로 상담 받아 보실 수 있습니다.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="legal">
+        <div class="wrap">
+          <ol>
+            <li>(상호) 보험대리점 (협회 등록번호 : 추후 입력)</li>
+            <li>준법심의필 번호 및 유효기간 (추후 입력)</li>
+            <li>본 광고는 광고 심의 기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.</li>
+            <li>보험계약자가 기존 보험계약을 해지하고 새로운 보험계약을 체결하는 과정에서 (1) 질병이력, 연령증가 등으로 가입이 거절되거나 보험료가 인상될 수 있습니다. (2) 가입 상품에 따라 새로운 면책기간 적용 및 보장 제한 등 기타 불이익이 발생할 수 있습니다.</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <footer class="company-foot">
+      <div class="wrap company-inner">
+        <div class="company-meta">
+          <p><a class="privacy-link" href="./preview-privacy.html">개인정보처리방침</a></p>
+          <p>(08513) 서울특별시 금천구 디지털로 178, A 동 520호</p>
+          <p>TEL:1577-6252 / FAX:02-6008-1612</p>
+          <p>사업자등록번호:131-86-16703</p>
+          <p>보험대리점 등록번호:제2009091278호</p>
+          <p class="company-copy">Copyright © 2011-2024 GLOBAL FM. All Rights Reserved.</p>
+        </div>
+        <img
+          class="company-logo-img"
+          src="./public/global-fm-mark.png"
+          alt="GLOBAL FM 사람이 중심이다. 백년의 약속"
+        />
+      </div>
+    </footer>
+    <script>
+      var joinModal = document.getElementById("joinModal");
+      function openJoin() {
+        joinModal.hidden = false;
+      }
+      document.getElementById("openJoin").addEventListener("click", openJoin);
+      document.getElementById("closeJoin").addEventListener("click", function () {
+        joinModal.hidden = true;
+      });
+      joinModal.addEventListener("click", function (e) {
+        if (e.target === joinModal) joinModal.hidden = true;
+      });
+      if (location.hash === "#join") openJoin();
+      document.getElementById("joinForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var name = document.getElementById("join-name").value.trim();
+        var phone = document.getElementById("join-phone").value.trim();
+        var birth = document.getElementById("join-birth").value;
+        var job = document.getElementById("join-job").value.trim();
+        var body =
+          "새로운 입사문의가 있습니다.\n\n" +
+          "성함: " + name + "\n" +
+          "핸드폰번호: " + phone + "\n" +
+          "생년월일: " + birth + "\n" +
+          "현직업: " + job + "\n" +
+          "개인정보 수집 동의: 동의";
+        window.location.href =
+          "mailto:zoocci@naver.com?subject=" +
+          encodeURIComponent("[입사문의] " + name) +
+          "&body=" + encodeURIComponent(body);
+        document.getElementById("joinMsg").textContent =
+          "이메일 보내기 창이 열립니다. 보내기를 눌러 주세요. 사이트에 올리면 자동으로 zoocci@naver.com 으로 접수됩니다.";
+      });
+
+      var demo = [
+        { phone: "010-****-4821", gender: "여성", status: "접수완료", time: "9. 2. 13:10" },
+        { phone: "010-****-1193", gender: "남성", status: "상담대기", time: "9. 2. 12:42" },
+        { phone: "010-****-7750", gender: "여성", status: "접수완료", time: "9. 2. 12:18" },
+        { phone: "010-****-2608", gender: "남성", status: "상담완료", time: "9. 2. 11:55" },
+        { phone: "010-****-9341", gender: "여성", status: "접수완료", time: "9. 2. 11:31" },
+        { phone: "010-****-5082", gender: "남성", status: "상담대기", time: "9. 2. 11:04" },
+        { phone: "010-****-6714", gender: "여성", status: "접수완료", time: "9. 2. 10:47" },
+        { phone: "010-****-3359", gender: "남성", status: "상담완료", time: "9. 2. 10:22" },
+        { phone: "010-****-8460", gender: "여성", status: "접수완료", time: "9. 2. 09:58" },
+        { phone: "010-****-1927", gender: "남성", status: "상담대기", time: "9. 2. 09:33" },
+        { phone: "010-****-7204", gender: "여성", status: "접수완료", time: "9. 2. 08:51" },
+        { phone: "010-****-4586", gender: "남성", status: "상담완료", time: "9. 2. 08:16" },
+        { phone: "010-****-0835", gender: "여성", status: "접수완료", time: "9. 1. 22:40" },
+        { phone: "010-****-6172", gender: "남성", status: "상담대기", time: "9. 1. 22:09" },
+        { phone: "010-****-2948", gender: "여성", status: "접수완료", time: "9. 1. 21:37" },
+        { phone: "010-****-9516", gender: "남성", status: "상담완료", time: "9. 1. 21:02" },
+        { phone: "010-****-3701", gender: "여성", status: "접수완료", time: "9. 1. 20:28" },
+        { phone: "010-****-8143", gender: "남성", status: "상담대기", time: "9. 1. 19:55" },
+        { phone: "010-****-5629", gender: "여성", status: "접수완료", time: "9. 1. 19:21" },
+        { phone: "010-****-1067", gender: "남성", status: "상담완료", time: "9. 1. 18:44" }
+      ];
+
+      function shuffle(list) {
+        var next = list.slice();
+        for (var i = next.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = next[i];
+          next[i] = next[j];
+          next[j] = t;
+        }
+        return next;
+      }
+
+      demo = shuffle(demo).map(function (item) {
+        return Object.assign({}, item, { gender: Math.random() < 0.5 ? "남성" : "여성" });
+      });
+
+      function renderStatus() {
+        var html = demo.map(function (item) {
+          return '<li><span class="status-phone">' + item.phone + '</span><span class="status-meta">' +
+            item.gender + '</span><span class="status-badge">' + item.status + "</span></li>";
+        }).join("");
+        document.getElementById("statusList").innerHTML = html + html;
+      }
+      renderStatus();
+
+      var payModal = document.getElementById("payModal");
+      var plan = "basic";
+      function setPlan(next) {
+        plan = next;
+        document.getElementById("planBasic").classList.toggle("on", next === "basic");
+        document.getElementById("planPremium").classList.toggle("on", next === "premium");
+        document.getElementById("doPay").textContent = next === "basic" ? "30,000원 결제하기" : "100,000원 결제하기";
+      }
+      document.getElementById("openPay").addEventListener("click", function () {
+        payModal.hidden = false;
+      });
+      document.getElementById("closePay").addEventListener("click", function () {
+        payModal.hidden = true;
+      });
+      payModal.addEventListener("click", function (e) {
+        if (e.target === payModal) payModal.hidden = true;
+      });
+      document.getElementById("planBasic").addEventListener("click", function () { setPlan("basic"); });
+      document.getElementById("planPremium").addEventListener("click", function () { setPlan("premium"); });
+      document.getElementById("doPay").addEventListener("click", function () {
+        document.getElementById("payMsg").textContent =
+          (plan === "basic" ? "베이직 30,000원" : "프리미엄 100,000원") +
+          " 결제창입니다. 실제 카드 결제는 다음 단계에서 연결됩니다.";
+      });
+    </script>
+  </body>
+</html>
