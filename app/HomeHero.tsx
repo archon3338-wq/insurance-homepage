@@ -165,9 +165,9 @@ export default function HomeHero() {
                 <strong>베이직</strong>
                 <em>30,000원</em>
                 <ul className="plan-points">
-                  <li>보장분석 상담</li>
-                  <li>분석 파일 제공</li>
-                  <li>보험 분석 후 콜 or 메신저 상담</li>
+                  <li>심화분석 상담</li>
+                  <li>분석 파일 제공(상세내용)</li>
+                  <li>보험 심화분석 자료+전화</li>
                 </ul>
               </label>
               <label className={`plan ${plan === "premium" ? "on" : ""}`}>
@@ -183,8 +183,8 @@ export default function HomeHero() {
                   <li>심화분석 + 가족 보험 상담</li>
                   <li>분석 파일 제공(상세내용)</li>
                   <li>
-                    보험 분석 후 콜 or 메신저 or{" "}
-                    <span className="plan-hot">대면 상담</span>
+                    보험 심화분석 자료+전화or
+                    <span className="plan-hot">대면</span>
                   </li>
                 </ul>
               </label>
