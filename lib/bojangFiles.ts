@@ -24,10 +24,13 @@ async function readStore(): Promise<Store> {
   try {
     const raw = await fs.readFile(dataPath, "utf8");
     const parsed = JSON.parse(raw) as Store;
-    const files = (Array.isArray(parsed.files) ? parsed.files : []).map((file) => ({
-      ...file,
-      group: file.group === "female" ? "female" : "male",
-    }));
+    const files: BojangFile[] = (Array.isArray(parsed.files) ? parsed.files : []).map(
+      (file): BojangFile => ({
+        ...file,
+        group: file.group === "female" ? "female" : "male",
+      })
+    );
+    
     return { files };
   } catch {
     return { files: [] };
