@@ -12,8 +12,7 @@ export default function SiteHeader() {
       <header className="topbar">
         <div className="wrap topbar-inner">
           <Link className="brand" href="/">
-            <strong className="brand-main">리치앤아이</strong>
-            <span className="brand-sub">리케어</span>
+            <strong className="brand-main">아이리케어</strong>
           </Link>
           <button type="button" className="nav-btn" onClick={() => setJoinOpen(true)}>
             입사문의

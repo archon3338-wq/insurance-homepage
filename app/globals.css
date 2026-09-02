@@ -175,8 +175,7 @@ body:not(:has(.home-shell)) .topbar {
 
 .brand {
   display: flex;
-  align-items: flex-end;
-  gap: 8px;
+  align-items: center;
   font-family: var(--font);
   letter-spacing: -0.04em;
   color: #fff;
@@ -186,15 +185,6 @@ body:not(:has(.home-shell)) .topbar {
   font-size: 30px;
   font-weight: 800;
   line-height: 1;
-}
-
-.brand-sub {
-  font-size: 16px;
-  font-weight: 700;
-  opacity: 0.92;
-  line-height: 1;
-  position: relative;
-  top: 1px;
 }
 
 .brand span {
@@ -234,11 +224,12 @@ body:not(:has(.home-shell)) .topbar {
   border: 0;
   font-family: var(--font);
   font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.04em;
   cursor: pointer;
   padding: 8px 4px;
   border-radius: 0;
+  line-height: 1;
 }
 
 .nav-link:hover,
