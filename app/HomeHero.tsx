@@ -122,7 +122,7 @@ export default function HomeHero() {
                   <li>고객의 이익을 최우선으로 객관적 분석</li>
                   <li>필요한 보험과 중복보험 객관적 분석</li>
                   <li>본인보험 분석 파일 제공</li>
-                  <li>보험을 팔지 않는 독립성 분석</li>
+                  <li>보험 가입 권유 없는 100% 객관적 분석</li>
                 </ul>
               </div>
             </div>
