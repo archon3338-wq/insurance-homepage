@@ -84,7 +84,7 @@ export async function POST(request: Request) {
 
     const resend = new Resend(apiKey);
     const { error } = await resend.emails.send({
-      from: "입사문의 <beth.t@example.com>",
+      from: "입사문의 <noreply@irecare.com>",
       to: [toEmail],
       subject: `[입사문의] ${name} / ${phone}`,
       text: [
