@@ -83,7 +83,10 @@ export default function HomeHero() {
       <div className="wrap">
         <div className="hero-intro">
           <p className="eyebrow">ABOUT I-RECARE</p>
-          <h1>같은 상담, 결과는 다릅니다</h1>
+          <h1>
+            같은 상담, <em>결과는</em> 다릅니다
+          </h1>
+          <p className="hero-caption">내 보험을 정확히 아는 것이, 더 나은 오늘을 만듭니다.</p>
         </div>
         <div className="hero-split">
         <div className="hero-col">
@@ -104,16 +107,16 @@ export default function HomeHero() {
                 ))}
               </ul>
             </div>
+            <p className="status-foot">👥 오늘도 고객님의 보험을 하나씩 확인하고 있습니다</p>
           </div>
         </div>
 
         <div className="hero-col">
           <article className="inquiry-card" id="inquiry">
-            <h2 className="compare-title">무료 상담 vs 유료 상담</h2>
-            <p className="compare-sub">같은 상담, 결과는 다릅니다</p>
+            <h2 className="compare-title">무료상담 vs 유료상담</h2>
             <div className="compare-box">
               <div className="compare-col free">
-                <h3>무료 보험상담</h3>
+                <h3>💬 무료 보험상담</h3>
                 <ul>
                   <li>고객 중심이 아닌 설계사 중심 상담</li>
                   <li>기존보험 해지 후 새보험 가입 권유</li>
@@ -122,7 +125,7 @@ export default function HomeHero() {
                 </ul>
               </div>
               <div className="compare-col paid">
-                <h3>유료 보험상담</h3>
+                <h3>✅ 유료 보험상담</h3>
                 <ul>
                   <li>고객의 이익을 최우선으로 객관적 분석</li>
                   <li>필요한 보험과 중복보험 객관적 분석</li>
@@ -139,7 +142,7 @@ export default function HomeHero() {
               <em className="em-blue">내 보험을 정확하게 파악하고 있는지</em> 입니다
             </p>
             <button type="button" className="inquiry-btn" onClick={() => setPayOpen(true)}>
-              문의하기
+              무료로 내 보험 확인하기 →
             </button>
           </article>
         </div>
