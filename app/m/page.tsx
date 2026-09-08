@@ -45,7 +45,7 @@ export default function MobilePage() {
             <p>빠진 보장을 기준으로 알기 쉽게 안내드립니다.</p>
           </article>
           <article>
-            <strong>내 가족은 어떻게 보상 받을 수 있을까</strong>
+            <strong>내 가족은 어떻게 보상 받을 수 있을까?</strong>
             <p>가족 전체 보상관련 전문적으로 상담 받아 보실 수 있습니다.</p>
           </article>
         </section>

@@ -14,6 +14,10 @@ export default function HomePage() {
 
         <section className="reasons">
           <div className="wrap">
+            <div className="section-head">
+              <p className="eyebrow">WHY I-RECARE</p>
+              <h2>이런 때 확인해 보세요</h2>
+            </div>
             <div className="reason-cols">
               <article>
                 <span className="reason-icon">
@@ -33,7 +37,7 @@ export default function HomePage() {
                 <span className="reason-icon">
                   <IconFamily />
                 </span>
-                <strong>내 가족은 어떻게 보상 받을 수 있을까</strong>
+                <strong>내 가족은 어떻게 보상 받을 수 있을까?</strong>
                 <p>가족 전체 보상관련 전문적으로 상담 받아 보실 수 있습니다.</p>
               </article>
             </div>
@@ -74,11 +78,6 @@ export default function HomePage() {
             <p>보험대리점 등록번호:제2009091278호</p>
             <p className="company-copy">Copyright © 2011-2024 GLOBAL FM. All Rights Reserved.</p>
           </div>
-          <img
-            className="company-logo-img"
-            src="/global-fm-mark.png"
-            alt="GLOBAL FM 사람이 중심이다. 백년의 약속"
-          />
         </div>
       </footer>
     </>

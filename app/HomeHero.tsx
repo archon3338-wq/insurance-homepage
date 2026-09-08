@@ -80,7 +80,12 @@ export default function HomeHero() {
 
   return (
     <section className="hero">
-      <div className="wrap hero-split">
+      <div className="wrap">
+        <div className="hero-intro">
+          <p className="eyebrow">ABOUT I-RECARE</p>
+          <h1>같은 상담, 결과는 다릅니다</h1>
+        </div>
+        <div className="hero-split">
         <div className="hero-col">
           <div className="status-board">
             <div className="status-head">
@@ -137,6 +142,7 @@ export default function HomeHero() {
               문의하기
             </button>
           </article>
+        </div>
         </div>
       </div>
 
