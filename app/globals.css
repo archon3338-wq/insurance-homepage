@@ -838,6 +838,166 @@ body:not(:has(.home-shell)) .topbar {
   box-shadow: 0 0 0 3px rgba(11, 61, 46, 0.12);
 }
 
+.pay-modal {
+  width: min(520px, 100%);
+  max-height: min(92vh, 860px);
+  overflow: auto;
+}
+
+.pay-form[hidden],
+.pg-window[hidden] {
+  display: none !important;
+}
+
+.pay-amount-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pay-amount-row .pay-btn {
+  margin: 0;
+}
+
+.pay-back {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+.pay-form .pay-btn {
+  margin-top: 4px;
+}
+
+.consent-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--green);
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.policy-back {
+  z-index: 50;
+}
+
+.policy-modal {
+  width: min(560px, 100%);
+  max-height: min(90vh, 760px);
+  overflow: auto;
+}
+
+.privacy-notice {
+  margin: 8px 0 20px;
+}
+
+.privacy-notice h4 {
+  font-size: 15px;
+  margin: 18px 0 8px;
+}
+
+.privacy-notice p,
+.privacy-notice li {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.65;
+}
+
+.privacy-notice ul {
+  margin: 8px 0 0 18px;
+}
+
+.privacy-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.privacy-table th,
+.privacy-table td {
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.privacy-table thead th {
+  background: #f7f8f7;
+  color: var(--muted);
+  font-weight: 700;
+  width: auto;
+}
+
+.privacy-table tbody th {
+  width: 32%;
+  background: #fafafa;
+  font-weight: 700;
+  color: #333;
+}
+
+.pg-window {
+  padding-top: 4px;
+}
+
+.pg-brand {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--green);
+  background: var(--green-pale);
+  border-radius: 999px;
+  padding: 4px 10px;
+  margin-bottom: 10px;
+}
+
+.pg-summary {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 8px 0 18px;
+}
+
+.pg-summary div {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+}
+
+.pg-summary div:last-child {
+  border-bottom: 0;
+}
+
+.pg-summary dt {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pg-summary dd {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pg-price {
+  color: var(--green);
+  font-size: 20px;
+}
+
 .eyebrow {
   display: inline-block;
   font-size: 12px;

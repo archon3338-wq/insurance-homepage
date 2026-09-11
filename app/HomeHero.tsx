@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import PayFlow from "./PayFlow";
 
 type StatusItem = {
   id: string;
@@ -33,8 +34,6 @@ const DEMO_STATUS: StatusItem[] = [
   { id: "d20", maskedPhone: "010-***-*067", gender: "남성", status: "상담완료", createdAt: "2026-09-01T18:44:00.000Z" },
 ];
 
-type Plan = "basic" | "premium";
-
 function shuffle<T>(list: T[]) {
   const next = [...list];
   for (let i = next.length - 1; i > 0; i--) {
@@ -61,8 +60,6 @@ function displayMaskedPhone(phone: string) {
 export default function HomeHero() {
   const [items, setItems] = useState<StatusItem[]>(() => mixStatus(DEMO_STATUS));
   const [payOpen, setPayOpen] = useState(false);
-  const [plan, setPlan] = useState<Plan>("basic");
-  const [payMessage, setPayMessage] = useState("");
 
   const loadStatus = useCallback(() => {
     fetch("/api/lead-status")
@@ -77,13 +74,6 @@ export default function HomeHero() {
   useEffect(() => {
     loadStatus();
   }, [loadStatus]);
-
-  function requestPay() {
-    const label = plan === "basic" ? "베이직 30,000원" : "프리미엄 100,000원";
-    setPayMessage(
-      `${label} 결제창입니다. 실제 카드 결제는 다음 단계에서 연결됩니다.`,
-    );
-  }
 
   return (
     <section className="hero">
@@ -156,63 +146,7 @@ export default function HomeHero() {
         </div>
       </div>
 
-      {payOpen ? (
-        <div className="modal-back" onClick={() => setPayOpen(false)}>
-          <div
-            className="modal"
-            role="dialog"
-            aria-labelledby="pay-title"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button type="button" className="modal-close" onClick={() => setPayOpen(false)}>
-              닫기
-            </button>
-            <h3 id="pay-title">분석 상담 결제</h3>
-            <p className="modal-sub">원하시는 플랜을 고른 뒤 결제를 진행해 주세요.</p>
-
-            <div className="plan-grid">
-              <label className={`plan ${plan === "basic" ? "on" : ""}`}>
-                <input
-                  type="radio"
-                  name="plan"
-                  checked={plan === "basic"}
-                  onChange={() => setPlan("basic")}
-                />
-                <strong>베이직</strong>
-                <em>30,000원</em>
-                <ul className="plan-points">
-                  <li>심화분석 상담</li>
-                  <li>분석 파일 제공(상세내용)</li>
-                  <li>보험 심화분석 자료+전화</li>
-                </ul>
-              </label>
-              <label className={`plan ${plan === "premium" ? "on" : ""}`}>
-                <input
-                  type="radio"
-                  name="plan"
-                  checked={plan === "premium"}
-                  onChange={() => setPlan("premium")}
-                />
-                <strong>프리미엄</strong>
-                <em>100,000원</em>
-                <ul className="plan-points">
-                  <li>심화분석 + 가족 보험 상담</li>
-                  <li>분석 파일 제공(상세내용)</li>
-                  <li>
-                    보험 심화분석 자료+전화or
-                    <span className="plan-hot">대면</span>
-                  </li>
-                </ul>
-              </label>
-            </div>
-
-            <button type="button" className="pay-btn" onClick={requestPay}>
-              {plan === "basic" ? "30,000원" : "100,000원"} 결제하기
-            </button>
-            {payMessage ? <p className="msg ok">{payMessage}</p> : null}
-          </div>
-        </div>
-      ) : null}
+      {payOpen ? <PayFlow onClose={() => setPayOpen(false)} /> : null}
     </section>
   );
 }
