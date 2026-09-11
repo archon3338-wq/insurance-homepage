@@ -1303,6 +1303,24 @@ button[type="submit"]:disabled {
   margin-bottom: 8px;
 }
 
+.legal-copy {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #6b736f;
+}
+
+.legal-copy p {
+  margin: 0 0 14px;
+}
+
+.legal-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.legal-warn {
+  color: #c0352b;
+}
+
 .company-foot {
   background: #fff;
   padding: 36px 0 44px;
