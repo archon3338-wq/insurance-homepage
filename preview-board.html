@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>게시판 | 아이리케어</title>
+    <link rel="stylesheet" href="./app/globals.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="./preview.html">
+          <span class="brand-text">
+            <strong class="brand-main">아이리케어</strong>
+            <span class="brand-sub">내 보험, 다시 케어하다</span>
+          </span>
+        </a>
+        <div class="topbar-actions">
+          <a class="menu-link" href="./preview.html">홈</a>
+          <a class="menu-link" href="./preview-info.html">보상및정보</a>
+          <a class="menu-link on" href="./preview-board.html">게시판</a>
+          <a class="nav-btn" href="./preview.html#join">입사문의</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="info-page board-page">
+      <div class="wrap" id="boardListView">
+        <div class="info-head">
+          <h1>게시판</h1>
+          <p>궁금한 점을 남겨 주세요. 글 작성 시 비밀번호를 설정하면 직접 삭제할 수 있습니다.</p>
+        </div>
+        <div class="board-toolbar">
+          <p class="board-count" id="boardCount">전체 0건</p>
+          <button type="button" class="board-write-btn" id="openWrite">글쓰기</button>
+        </div>
+        <div class="board-list" id="boardList"></div>
+        <p class="info-empty" id="boardEmpty">아직 글이 없습니다. 첫 글을 남겨 보세요.</p>
+      </div>
+
+      <div class="wrap board-narrow" id="boardWriteView" hidden>
+        <div class="info-head">
+          <h1>글쓰기</h1>
+          <p>비밀번호를 설정해 두면 나중에 글을 삭제할 수 있습니다.</p>
+        </div>
+        <form class="board-form" id="boardForm">
+          <div class="field">
+            <label for="board-title">제목</label>
+            <input id="board-title" type="text" maxlength="80" placeholder="제목을 입력해 주세요" required />
+          </div>
+          <div class="field">
+            <label for="board-author">작성자</label>
+            <input id="board-author" type="text" maxlength="20" placeholder="이름" required />
+          </div>
+          <div class="field">
+            <label for="board-content">내용</label>
+            <textarea id="board-content" maxlength="5000" placeholder="내용을 입력해 주세요" required></textarea>
+          </div>
+          <div class="field">
+            <label for="board-password">비밀번호</label>
+            <input id="board-password" type="password" minlength="4" maxlength="40" placeholder="삭제 시 필요합니다 (4자 이상)" required />
+          </div>
+          <div class="board-actions">
+            <button type="button" class="board-ghost" id="cancelWrite">목록</button>
+            <button type="submit" class="board-write-btn">등록하기</button>
+          </div>
+          <p class="msg err" id="writeMsg" hidden></p>
+        </form>
+      </div>
+
+      <div class="wrap board-narrow" id="boardDetailView" hidden>
+        <article class="board-article">
+          <h1 id="detailTitle"></h1>
+          <p class="board-article-meta">
+            <span id="detailAuthor"></span>
+            <span id="detailDate"></span>
+          </p>
+          <div class="board-body" id="detailContent"></div>
+        </article>
+        <form class="board-delete" id="deleteForm">
+          <label for="board-delete-password">작성 시 설정한 비밀번호</label>
+          <div class="board-actions">
+            <button type="button" class="board-ghost" id="backToList">목록</button>
+            <input id="board-delete-password" type="password" placeholder="비밀번호" required />
+            <button type="submit" class="board-delete-btn">삭제</button>
+          </div>
+          <p class="msg err" id="deleteMsg" hidden></p>
+        </form>
+      </div>
+    </main>
+
+    <script>
+      var KEY = "irecare-board-posts";
+      var currentId = "";
+
+      function hashPw(pw) {
+        var h = 0;
+        var s = "irecare-board-v1:" + pw;
+        for (var i = 0; i < s.length; i++) {
+          h = ((h << 5) - h) + s.charCodeAt(i);
+          h |= 0;
+        }
+        return String(h);
+      }
+
+      function loadPosts() {
+        try {
+          var raw = localStorage.getItem(KEY);
+          var parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function savePosts(posts) {
+        localStorage.setItem(KEY, JSON.stringify(posts));
+      }
+
+      function formatDate(iso) {
+        return new Date(iso).toLocaleString("ko-KR", {
+          timeZone: "Asia/Seoul",
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      }
+
+      function show(view) {
+        document.getElementById("boardListView").hidden = view !== "list";
+        document.getElementById("boardWriteView").hidden = view !== "write";
+        document.getElementById("boardDetailView").hidden = view !== "detail";
+      }
+
+      function renderList() {
+        var posts = loadPosts().slice().sort(function (a, b) {
+          return b.createdAt.localeCompare(a.createdAt);
+        });
+        document.getElementById("boardCount").textContent = "전체 " + posts.length + "건";
+        document.getElementById("boardEmpty").hidden = posts.length !== 0;
+        var list = document.getElementById("boardList");
+        list.hidden = posts.length === 0;
+        list.innerHTML = "";
+        posts.forEach(function (post) {
+          var a = document.createElement("a");
+          a.href = "#";
+          a.className = "board-item";
+          a.innerHTML =
+            '<strong class="board-item-title"></strong>' +
+            '<span class="board-item-author"></span>' +
+            '<span class="board-item-date"></span>';
+          a.querySelector(".board-item-title").textContent = post.title;
+          a.querySelector(".board-item-author").textContent = post.author;
+          a.querySelector(".board-item-date").textContent = formatDate(post.createdAt);
+          a.addEventListener("click", function (e) {
+            e.preventDefault();
+            openDetail(post.id);
+          });
+          list.appendChild(a);
+        });
+        show("list");
+      }
+
+      function openDetail(id) {
+        var post = loadPosts().find(function (item) { return item.id === id; });
+        if (!post) return;
+        currentId = id;
+        document.getElementById("detailTitle").textContent = post.title;
+        document.getElementById("detailAuthor").textContent = post.author;
+        document.getElementById("detailDate").textContent = formatDate(post.createdAt);
+        document.getElementById("detailContent").textContent = post.content;
+        document.getElementById("board-delete-password").value = "";
+        document.getElementById("deleteMsg").hidden = true;
+        show("detail");
+      }
+
+      document.getElementById("openWrite").addEventListener("click", function () {
+        document.getElementById("boardForm").reset();
+        document.getElementById("writeMsg").hidden = true;
+        show("write");
+      });
+      document.getElementById("cancelWrite").addEventListener("click", renderList);
+      document.getElementById("backToList").addEventListener("click", renderList);
+
+      document.getElementById("boardForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var title = document.getElementById("board-title").value.trim();
+        var author = document.getElementById("board-author").value.trim();
+        var content = document.getElementById("board-content").value.trim();
+        var password = document.getElementById("board-password").value;
+        var msg = document.getElementById("writeMsg");
+        if (title.length < 2) {
+          msg.textContent = "제목은 2자 이상 입력해 주세요.";
+          msg.hidden = false;
+          return;
+        }
+        if (password.length < 4) {
+          msg.textContent = "비밀번호는 4자 이상 입력해 주세요.";
+          msg.hidden = false;
+          return;
+        }
+        var posts = loadPosts();
+        posts.unshift({
+          id: String(Date.now()),
+          title: title,
+          author: author,
+          content: content,
+          passwordHash: hashPw(password),
+          createdAt: new Date().toISOString()
+        });
+        savePosts(posts.slice(0, 200));
+        openDetail(posts[0].id);
+      });
+
+      document.getElementById("deleteForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var password = document.getElementById("board-delete-password").value;
+        var posts = loadPosts();
+        var post = posts.find(function (item) { return item.id === currentId; });
+        var msg = document.getElementById("deleteMsg");
+        if (!post || post.passwordHash !== hashPw(password)) {
+          msg.textContent = "비밀번호가 일치하지 않습니다.";
+          msg.hidden = false;
+          return;
+        }
+        savePosts(posts.filter(function (item) { return item.id !== currentId; }));
+        renderList();
+      });
+
+      renderList();
+    </script>
+  </body>
+</html>

@@ -19,6 +19,7 @@
           <div class="topbar-actions">
             <a class="menu-link on" href="./preview.html">홈</a>
             <a class="menu-link" href="./preview-info.html">보상및정보</a>
+            <a class="menu-link" href="./preview-board.html">게시판</a>
             <button type="button" class="nav-btn" id="openJoin">입사문의</button>
           </div>
       </div>
@@ -74,7 +75,7 @@
                 <em class="em-red">잘못된 보험료 지출</em>을 얼마나 줄이고,<br />
                 <em class="em-blue">내 보험을 정확하게 파악하고 있는지</em> 입니다
               </p>
-              <button type="button" class="inquiry-btn" id="openPay">무료로 내 보험 확인하기 →</button>
+              <button type="button" class="inquiry-btn" id="openPay">내 보험 확인하기 →</button>
             </article>
           </div>
         </div>
@@ -193,19 +194,6 @@
         </div>
       </section>
     </main>
-
-    <footer class="company-foot">
-      <div class="wrap company-inner">
-        <div class="company-meta">
-          <p><a class="privacy-link" href="./preview-privacy.html">개인정보처리방침</a></p>
-          <p>(08513) 서울특별시 금천구 디지털로 178, A 동 520호</p>
-          <p>TEL:1577-6252 / FAX:02-6008-1612</p>
-          <p>사업자등록번호:131-86-16703</p>
-          <p>보험대리점 등록번호:제2009091278호</p>
-          <p class="company-copy">Copyright © 2011-2024 GLOBAL FM. All Rights Reserved.</p>
-        </div>
-      </div>
-    </footer>
     <script>
       var joinModal = document.getElementById("joinModal");
       function openJoin() {
@@ -241,26 +229,26 @@
       });
 
       var demo = [
-        { phone: "010-****-4821", gender: "여성", status: "접수완료", time: "9. 2. 13:10" },
-        { phone: "010-****-1193", gender: "남성", status: "상담대기", time: "9. 2. 12:42" },
-        { phone: "010-****-7750", gender: "여성", status: "접수완료", time: "9. 2. 12:18" },
-        { phone: "010-****-2608", gender: "남성", status: "상담완료", time: "9. 2. 11:55" },
-        { phone: "010-****-9341", gender: "여성", status: "접수완료", time: "9. 2. 11:31" },
-        { phone: "010-****-5082", gender: "남성", status: "상담대기", time: "9. 2. 11:04" },
-        { phone: "010-****-6714", gender: "여성", status: "접수완료", time: "9. 2. 10:47" },
-        { phone: "010-****-3359", gender: "남성", status: "상담완료", time: "9. 2. 10:22" },
-        { phone: "010-****-8460", gender: "여성", status: "접수완료", time: "9. 2. 09:58" },
-        { phone: "010-****-1927", gender: "남성", status: "상담대기", time: "9. 2. 09:33" },
-        { phone: "010-****-7204", gender: "여성", status: "접수완료", time: "9. 2. 08:51" },
-        { phone: "010-****-4586", gender: "남성", status: "상담완료", time: "9. 2. 08:16" },
-        { phone: "010-****-0835", gender: "여성", status: "접수완료", time: "9. 1. 22:40" },
-        { phone: "010-****-6172", gender: "남성", status: "상담대기", time: "9. 1. 22:09" },
-        { phone: "010-****-2948", gender: "여성", status: "접수완료", time: "9. 1. 21:37" },
-        { phone: "010-****-9516", gender: "남성", status: "상담완료", time: "9. 1. 21:02" },
-        { phone: "010-****-3701", gender: "여성", status: "접수완료", time: "9. 1. 20:28" },
-        { phone: "010-****-8143", gender: "남성", status: "상담대기", time: "9. 1. 19:55" },
-        { phone: "010-****-5629", gender: "여성", status: "접수완료", time: "9. 1. 19:21" },
-        { phone: "010-****-1067", gender: "남성", status: "상담완료", time: "9. 1. 18:44" }
+        { phone: "010-***-*821", gender: "여성", status: "접수완료", time: "9. 2. 13:10" },
+        { phone: "010-***-*193", gender: "남성", status: "상담대기", time: "9. 2. 12:42" },
+        { phone: "010-***-*750", gender: "여성", status: "접수완료", time: "9. 2. 12:18" },
+        { phone: "010-***-*608", gender: "남성", status: "상담완료", time: "9. 2. 11:55" },
+        { phone: "010-***-*341", gender: "여성", status: "접수완료", time: "9. 2. 11:31" },
+        { phone: "010-***-*082", gender: "남성", status: "상담대기", time: "9. 2. 11:04" },
+        { phone: "010-***-*714", gender: "여성", status: "접수완료", time: "9. 2. 10:47" },
+        { phone: "010-***-*359", gender: "남성", status: "상담완료", time: "9. 2. 10:22" },
+        { phone: "010-***-*460", gender: "여성", status: "접수완료", time: "9. 2. 09:58" },
+        { phone: "010-***-*927", gender: "남성", status: "상담대기", time: "9. 2. 09:33" },
+        { phone: "010-***-*204", gender: "여성", status: "접수완료", time: "9. 2. 08:51" },
+        { phone: "010-***-*586", gender: "남성", status: "상담완료", time: "9. 2. 08:16" },
+        { phone: "010-***-*835", gender: "여성", status: "접수완료", time: "9. 1. 22:40" },
+        { phone: "010-***-*172", gender: "남성", status: "상담대기", time: "9. 1. 22:09" },
+        { phone: "010-***-*948", gender: "여성", status: "접수완료", time: "9. 1. 21:37" },
+        { phone: "010-***-*516", gender: "남성", status: "상담완료", time: "9. 1. 21:02" },
+        { phone: "010-***-*701", gender: "여성", status: "접수완료", time: "9. 1. 20:28" },
+        { phone: "010-***-*143", gender: "남성", status: "상담대기", time: "9. 1. 19:55" },
+        { phone: "010-***-*629", gender: "여성", status: "접수완료", time: "9. 1. 19:21" },
+        { phone: "010-***-*067", gender: "남성", status: "상담완료", time: "9. 1. 18:44" }
       ];
 
       function shuffle(list) {

@@ -63,23 +63,6 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-
-      <footer className="company-foot">
-        <div className="wrap company-inner">
-          <div className="company-meta">
-            <p>
-              <a className="privacy-link" href="/privacy">
-                개인정보처리방침
-              </a>
-            </p>
-            <p>(08513) 서울특별시 금천구 디지털로 178, A 동 520호</p>
-            <p>TEL:1577-6252 / FAX:02-6008-1612</p>
-            <p>사업자등록번호:131-86-16703</p>
-            <p>보험대리점 등록번호:제2009091278호</p>
-            <p className="company-copy">Copyright © 2011-2024 GLOBAL FM. All Rights Reserved.</p>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }

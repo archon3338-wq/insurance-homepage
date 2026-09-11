@@ -11,26 +11,26 @@ type StatusItem = {
 };
 
 const DEMO_STATUS: StatusItem[] = [
-  { id: "d1", maskedPhone: "010-****-4821", gender: "여성", status: "접수완료", createdAt: "2026-09-02T04:10:00.000Z" },
-  { id: "d2", maskedPhone: "010-****-1193", gender: "남성", status: "상담대기", createdAt: "2026-09-02T03:42:00.000Z" },
-  { id: "d3", maskedPhone: "010-****-7750", gender: "여성", status: "접수완료", createdAt: "2026-09-02T03:18:00.000Z" },
-  { id: "d4", maskedPhone: "010-****-2608", gender: "남성", status: "상담완료", createdAt: "2026-09-02T02:55:00.000Z" },
-  { id: "d5", maskedPhone: "010-****-9341", gender: "여성", status: "접수완료", createdAt: "2026-09-02T02:31:00.000Z" },
-  { id: "d6", maskedPhone: "010-****-5082", gender: "남성", status: "상담대기", createdAt: "2026-09-02T02:04:00.000Z" },
-  { id: "d7", maskedPhone: "010-****-6714", gender: "여성", status: "접수완료", createdAt: "2026-09-02T01:47:00.000Z" },
-  { id: "d8", maskedPhone: "010-****-3359", gender: "남성", status: "상담완료", createdAt: "2026-09-02T01:22:00.000Z" },
-  { id: "d9", maskedPhone: "010-****-8460", gender: "여성", status: "접수완료", createdAt: "2026-09-02T00:58:00.000Z" },
-  { id: "d10", maskedPhone: "010-****-1927", gender: "남성", status: "상담대기", createdAt: "2026-09-02T00:33:00.000Z" },
-  { id: "d11", maskedPhone: "010-****-7204", gender: "여성", status: "접수완료", createdAt: "2026-09-01T23:51:00.000Z" },
-  { id: "d12", maskedPhone: "010-****-4586", gender: "남성", status: "상담완료", createdAt: "2026-09-01T23:16:00.000Z" },
-  { id: "d13", maskedPhone: "010-****-0835", gender: "여성", status: "접수완료", createdAt: "2026-09-01T22:40:00.000Z" },
-  { id: "d14", maskedPhone: "010-****-6172", gender: "남성", status: "상담대기", createdAt: "2026-09-01T22:09:00.000Z" },
-  { id: "d15", maskedPhone: "010-****-2948", gender: "여성", status: "접수완료", createdAt: "2026-09-01T21:37:00.000Z" },
-  { id: "d16", maskedPhone: "010-****-9516", gender: "남성", status: "상담완료", createdAt: "2026-09-01T21:02:00.000Z" },
-  { id: "d17", maskedPhone: "010-****-3701", gender: "여성", status: "접수완료", createdAt: "2026-09-01T20:28:00.000Z" },
-  { id: "d18", maskedPhone: "010-****-8143", gender: "남성", status: "상담대기", createdAt: "2026-09-01T19:55:00.000Z" },
-  { id: "d19", maskedPhone: "010-****-5629", gender: "여성", status: "접수완료", createdAt: "2026-09-01T19:21:00.000Z" },
-  { id: "d20", maskedPhone: "010-****-1067", gender: "남성", status: "상담완료", createdAt: "2026-09-01T18:44:00.000Z" },
+  { id: "d1", maskedPhone: "010-***-*821", gender: "여성", status: "접수완료", createdAt: "2026-09-02T04:10:00.000Z" },
+  { id: "d2", maskedPhone: "010-***-*193", gender: "남성", status: "상담대기", createdAt: "2026-09-02T03:42:00.000Z" },
+  { id: "d3", maskedPhone: "010-***-*750", gender: "여성", status: "접수완료", createdAt: "2026-09-02T03:18:00.000Z" },
+  { id: "d4", maskedPhone: "010-***-*608", gender: "남성", status: "상담완료", createdAt: "2026-09-02T02:55:00.000Z" },
+  { id: "d5", maskedPhone: "010-***-*341", gender: "여성", status: "접수완료", createdAt: "2026-09-02T02:31:00.000Z" },
+  { id: "d6", maskedPhone: "010-***-*082", gender: "남성", status: "상담대기", createdAt: "2026-09-02T02:04:00.000Z" },
+  { id: "d7", maskedPhone: "010-***-*714", gender: "여성", status: "접수완료", createdAt: "2026-09-02T01:47:00.000Z" },
+  { id: "d8", maskedPhone: "010-***-*359", gender: "남성", status: "상담완료", createdAt: "2026-09-02T01:22:00.000Z" },
+  { id: "d9", maskedPhone: "010-***-*460", gender: "여성", status: "접수완료", createdAt: "2026-09-02T00:58:00.000Z" },
+  { id: "d10", maskedPhone: "010-***-*927", gender: "남성", status: "상담대기", createdAt: "2026-09-02T00:33:00.000Z" },
+  { id: "d11", maskedPhone: "010-***-*204", gender: "여성", status: "접수완료", createdAt: "2026-09-01T23:51:00.000Z" },
+  { id: "d12", maskedPhone: "010-***-*586", gender: "남성", status: "상담완료", createdAt: "2026-09-01T23:16:00.000Z" },
+  { id: "d13", maskedPhone: "010-***-*835", gender: "여성", status: "접수완료", createdAt: "2026-09-01T22:40:00.000Z" },
+  { id: "d14", maskedPhone: "010-***-*172", gender: "남성", status: "상담대기", createdAt: "2026-09-01T22:09:00.000Z" },
+  { id: "d15", maskedPhone: "010-***-*948", gender: "여성", status: "접수완료", createdAt: "2026-09-01T21:37:00.000Z" },
+  { id: "d16", maskedPhone: "010-***-*516", gender: "남성", status: "상담완료", createdAt: "2026-09-01T21:02:00.000Z" },
+  { id: "d17", maskedPhone: "010-***-*701", gender: "여성", status: "접수완료", createdAt: "2026-09-01T20:28:00.000Z" },
+  { id: "d18", maskedPhone: "010-***-*143", gender: "남성", status: "상담대기", createdAt: "2026-09-01T19:55:00.000Z" },
+  { id: "d19", maskedPhone: "010-***-*629", gender: "여성", status: "접수완료", createdAt: "2026-09-01T19:21:00.000Z" },
+  { id: "d20", maskedPhone: "010-***-*067", gender: "남성", status: "상담완료", createdAt: "2026-09-01T18:44:00.000Z" },
 ];
 
 type Plan = "basic" | "premium";
@@ -48,7 +48,14 @@ function mixStatus(list: StatusItem[]) {
   return shuffle(list).map((item) => ({
     ...item,
     gender: Math.random() < 0.5 ? "남성" : "여성",
+    maskedPhone: displayMaskedPhone(item.maskedPhone),
   }));
+}
+
+function displayMaskedPhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 6) return phone;
+  return `${digits.slice(0, 3)}-***-*${digits.slice(-3)}`;
 }
 
 export default function HomeHero() {
@@ -142,7 +149,7 @@ export default function HomeHero() {
               <em className="em-blue">내 보험을 정확하게 파악하고 있는지</em> 입니다
             </p>
             <button type="button" className="inquiry-btn" onClick={() => setPayOpen(true)}>
-              무료로 내 보험 확인하기 →
+              내 보험 확인하기 →
             </button>
           </article>
         </div>

@@ -26,6 +26,9 @@ export default function SiteHeader() {
             <Link className={`menu-link${pathname === "/info" ? " on" : ""}`} href="/info">
               보상및정보
             </Link>
+            <Link className={`menu-link${pathname.startsWith("/board") ? " on" : ""}`} href="/board">
+              게시판
+            </Link>
             <button type="button" className="nav-btn" onClick={() => setJoinOpen(true)}>
               입사문의
             </button>

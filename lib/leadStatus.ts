@@ -15,8 +15,8 @@ const dataPath = path.join(process.cwd(), "data", "lead-status.json");
 
 export function maskPhone(phone: string) {
   const digits = phone.replace(/\D/g, "");
-  if (digits.length < 7) return "010-****-****";
-  return `${digits.slice(0, 3)}-****-${digits.slice(-4)}`;
+  if (digits.length < 6) return "010-***-****";
+  return `${digits.slice(0, 3)}-***-*${digits.slice(-3)}`;
 }
 
 async function readStore(): Promise<Store> {
@@ -33,7 +33,11 @@ export async function listLeadStatus() {
   const store = await readStore();
   return store.items
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, 20);
+    .slice(0, 20)
+    .map((item) => ({
+      ...item,
+      maskedPhone: maskPhone(item.maskedPhone),
+    }));
 }
 
 export async function addLeadStatus(phone: string, genderLabel: string) {
