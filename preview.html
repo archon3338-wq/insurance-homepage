@@ -408,11 +408,39 @@
           item.gender + '</span><span class="status-badge">' + item.status + "</span></li>";
       }
 
-      function renderStatus() {
-        document.getElementById("statusList").innerHTML = demo.slice(0, 5).map(statusItemHtml).join("");
-        document.getElementById("statusDetailList").innerHTML = demo.map(statusItemHtml).join("");
+      function loadSavedStatus() {
+        try {
+          var raw = localStorage.getItem("irecare-lead-status");
+          var parsed = raw ? JSON.parse(raw) : null;
+          if (parsed && Array.isArray(parsed.items) && parsed.items.length) {
+            return parsed.items;
+          }
+        } catch (e) {}
+        return demo;
       }
-      renderStatus();
+
+      function renderStatus(list) {
+        var rows = list && list.length ? list : loadSavedStatus();
+        document.getElementById("statusList").innerHTML = rows.slice(0, 5).map(statusItemHtml).join("");
+        document.getElementById("statusDetailList").innerHTML = rows.map(statusItemHtml).join("");
+      }
+
+      function renderStatusFromLive(data) {
+        var rows = (data && data.items ? data.items : []).map(function (item) {
+          return {
+            phone: item.maskedPhone || item.phone,
+            gender: item.gender,
+            status: item.status
+          };
+        });
+        renderStatus(rows.length ? rows : loadSavedStatus());
+      }
+
+      renderStatus(loadSavedStatus());
+      fetch("https://www.irecare.com/api/lead-status", { cache: "no-store" })
+        .then(function (res) { return res.json(); })
+        .then(renderStatusFromLive)
+        .catch(function () { renderStatus(loadSavedStatus()); });
 
       var statusDetailModal = document.getElementById("statusDetailModal");
       document.getElementById("openStatusDetail").addEventListener("click", function () {

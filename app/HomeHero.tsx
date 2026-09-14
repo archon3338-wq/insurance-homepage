@@ -72,7 +72,7 @@ export default function HomeHero() {
   const [detailOpen, setDetailOpen] = useState(false);
 
   const loadStatus = useCallback(() => {
-    fetch("/api/lead-status")
+    fetch("/api/lead-status", { cache: "no-store" })
       .then((res) => res.json())
       .then((data: { items?: StatusItem[] }) => {
         const next = data.items || [];

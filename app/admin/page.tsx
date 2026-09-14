@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import SiteHeader from "../SiteHeader";
 
@@ -91,6 +92,14 @@ export default function AdminPage() {
           여기서 남성/여성 자료를 나눠 올릴 수 있습니다. 상단 보장분석 메뉴에서도
           같은 작업을 할 수 있습니다.
         </p>
+        <div className="admin-nav">
+          <Link className="admin-nav-link" href="/admin/status">
+            접수현황
+          </Link>
+          <Link className="admin-nav-link on" href="/admin">
+            자료 올리기
+          </Link>
+        </div>
 
         <form className="card" onSubmit={onSubmit}>
           <div className="field">

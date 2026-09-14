@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>접수현황 관리 | 아이리케어</title>
+    <link rel="stylesheet" href="./app/globals.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="./preview.html">
+          <span class="brand-text">
+            <strong class="brand-main">아이리케어</strong>
+            <span class="brand-sub">내 보험, 다시 케어하다</span>
+          </span>
+        </a>
+        <div class="topbar-actions">
+          <a class="menu-link" href="./preview.html">홈</a>
+          <a class="menu-link" href="./preview-info.html">보상및정보</a>
+          <a class="menu-link" href="./preview-board.html">게시판</a>
+          <a class="nav-btn" href="./preview.html#join">입사문의</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="section">
+      <div class="wrap inner-page admin-status-page">
+        <p class="eyebrow">ADMIN</p>
+        <h1>접수현황 관리</h1>
+        <p class="intro">
+          수정한 뒤 <strong>지금 저장</strong>을 누르면
+          <a href="https://www.irecare.com/" target="_blank" rel="noreferrer">www.irecare.com</a>
+          접수현황에도 저장됩니다. 비밀번호는 필요 없습니다.
+        </p>
+        <div class="admin-nav">
+          <a class="admin-nav-link on" href="./preview-admin-status.html">접수현황</a>
+          <a class="admin-nav-link" href="./preview.html">자료 올리기</a>
+        </div>
+
+        <div class="admin-status-toolbar">
+          <button type="button" class="board-write-btn" id="addRow">새 접수 추가</button>
+          <button type="button" class="board-ghost" id="saveNow">지금 저장</button>
+          <p class="msg ok" id="saveMsg">내용을 고친 뒤 지금 저장을 눌러 주세요.</p>
+        </div>
+
+        <div class="admin-status-table-wrap">
+          <table class="admin-status-table">
+            <thead>
+              <tr>
+                <th>핸드폰번호</th>
+                <th>성별</th>
+                <th>상태</th>
+                <th>접수시각</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="statusBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      var KEY = "irecare-lead-status";
+      var LIVE_GET = "https://www.irecare.com/api/lead-status";
+      var LIVE_PUT = "https://www.irecare.com/api/admin/lead-status";
+      var fallback = [
+        { id: "demo-1", phone: "010-***-*821", gender: "여성", status: "접수완료", createdAt: "2026-09-02T13:10" },
+        { id: "demo-2", phone: "010-***-*193", gender: "남성", status: "상담대기", createdAt: "2026-09-02T12:42" },
+        { id: "demo-3", phone: "010-***-*750", gender: "여성", status: "접수완료", createdAt: "2026-09-02T12:18" },
+        { id: "demo-4", phone: "010-***-*608", gender: "남성", status: "상담완료", createdAt: "2026-09-02T11:55" },
+        { id: "demo-5", phone: "010-***-*341", gender: "여성", status: "접수완료", createdAt: "2026-09-02T11:31" }
+      ];
+
+      function maskPhone(phone) {
+        var digits = String(phone || "").replace(/\D/g, "");
+        if (digits.length < 6) return String(phone || "").trim() || "010-***-****";
+        return digits.slice(0, 3) + "-***-*" + digits.slice(-3);
+      }
+
+      function toLocal(value) {
+        if (!value) return "";
+        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return value;
+        var date = new Date(value);
+        if (isNaN(date.getTime())) return "";
+        var pad = function (n) { return String(n).padStart(2, "0"); };
+        return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate()) + "T" + pad(date.getHours()) + ":" + pad(date.getMinutes());
+      }
+
+      function loadItems() {
+        try {
+          var raw = localStorage.getItem(KEY);
+          var parsed = raw ? JSON.parse(raw) : null;
+          if (parsed && Array.isArray(parsed.items) && parsed.items.length) return parsed.items;
+        } catch (e) {}
+        return fallback.slice();
+      }
+
+      function readRows() {
+        return Array.prototype.map.call(document.querySelectorAll("#statusBody tr"), function (row) {
+          var inputs = row.querySelectorAll("input, select");
+          return {
+            id: row.getAttribute("data-id"),
+            phone: maskPhone(inputs[0].value),
+            gender: inputs[1].value,
+            status: inputs[2].value,
+            createdAt: inputs[3].value
+          };
+        });
+      }
+
+      function saveItems(items) {
+        localStorage.setItem(KEY, JSON.stringify({ items: items }));
+        var msg = document.getElementById("saveMsg");
+        msg.className = "msg ok";
+        msg.textContent = "이 컴퓨터에 저장했습니다. 실제 사이트에 올리는 중...";
+        fetch(LIVE_PUT, {
+          method: "PUT",
+          cache: "no-store",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: items })
+        })
+          .then(function (res) {
+            return res.json().then(function (data) {
+              return { ok: res.ok, data: data };
+            });
+          })
+          .then(function (result) {
+            if (!result.ok) throw new Error(result.data && result.data.error);
+            msg.className = "msg ok";
+            msg.textContent = "실제 사이트(irecare.com)에 저장했습니다. 홈을 새로고침하면 접수현황이 바뀝니다.";
+          })
+          .catch(function () {
+            msg.className = "msg err";
+            msg.textContent = "이 컴퓨터에는 저장했습니다. 실제 사이트 저장은 https://www.irecare.com/admin/status 에서 해 주세요.";
+          });
+      }
+
+      var items = loadItems();
+
+      function render() {
+        document.getElementById("statusBody").innerHTML = items.map(function (item) {
+          return (
+            "<tr data-id=\"" + item.id + "\">" +
+              "<td><input type=\"tel\" value=\"" + (item.phone || "") + "\" /></td>" +
+              "<td><select><option" + (item.gender === "여성" ? " selected" : "") + ">여성</option><option" + (item.gender === "남성" ? " selected" : "") + ">남성</option></select></td>" +
+              "<td><select><option" + (item.status === "접수완료" ? " selected" : "") + ">접수완료</option><option" + (item.status === "상담대기" ? " selected" : "") + ">상담대기</option><option" + (item.status === "상담완료" ? " selected" : "") + ">상담완료</option></select></td>" +
+              "<td><input type=\"datetime-local\" value=\"" + (item.createdAt || "") + "\" /></td>" +
+              "<td><button type=\"button\" class=\"text-btn\">삭제</button></td>" +
+            "</tr>"
+          );
+        }).join("");
+      }
+
+      document.getElementById("addRow").addEventListener("click", function () {
+        items = readRows();
+        var now = new Date();
+        var pad = function (n) { return String(n).padStart(2, "0"); };
+        items.unshift({
+          id: String(Date.now()),
+          phone: "",
+          gender: "여성",
+          status: "접수완료",
+          createdAt: now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) + "T" + pad(now.getHours()) + ":" + pad(now.getMinutes())
+        });
+        render();
+      });
+      document.getElementById("statusBody").addEventListener("click", function (e) {
+        var btn = e.target.closest(".text-btn");
+        if (!btn) return;
+        items = readRows().filter(function (item) { return item.id !== btn.closest("tr").getAttribute("data-id"); });
+        render();
+        saveItems(items);
+      });
+      document.getElementById("saveNow").addEventListener("click", function () {
+        items = readRows();
+        render();
+        saveItems(items);
+      });
+      render();
+      fetch(LIVE_GET, { cache: "no-store" })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data && Array.isArray(data.items) && data.items.length) {
+            items = data.items.map(function (item) {
+              return {
+                id: item.id,
+                phone: item.maskedPhone || item.phone,
+                gender: item.gender,
+                status: item.status,
+                createdAt: toLocal(item.createdAt)
+              };
+            });
+          }
+          render();
+        })
+        .catch(function () { render(); });
+    </script>
+  </body>
+</html>
