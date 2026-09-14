@@ -198,7 +198,8 @@ export async function replaceLeadStatus(
 ) {
   const next: LeadStatusItem[] = items.slice(0, 50).map((item, index) => {
     const gender = item.gender === "남성" || item.gender === "여성" ? item.gender : "여성";
-    const status = isLeadStatus(item.status || "") ? item.status : "접수완료";
+    const rawStatus = item.status || "";
+    const status = isLeadStatus(rawStatus) ? rawStatus : "접수완료";
     const createdAt = item.createdAt && !Number.isNaN(new Date(item.createdAt).getTime())
       ? new Date(item.createdAt).toISOString()
       : new Date().toISOString();
