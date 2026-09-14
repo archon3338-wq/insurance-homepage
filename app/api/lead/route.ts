@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { addLeadStatus } from "@/lib/leadStatus";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 const PHONE_PATTERN = /^(01[016789])-?([0-9]{3,4})-?([0-9]{4})$/;
 
 function normalizePhone(value: string) {
