@@ -34,21 +34,13 @@ const DEMO_STATUS: StatusItem[] = [
   { id: "d20", maskedPhone: "010-***-*067", gender: "남성", status: "상담완료", createdAt: "2026-09-01T18:44:00.000Z" },
 ];
 
-function shuffle<T>(list: T[]) {
-  const next = [...list];
-  for (let i = next.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [next[i], next[j]] = [next[j], next[i]];
-  }
-  return next;
-}
-
-function mixStatus(list: StatusItem[]) {
-  return shuffle(list).map((item) => ({
-    ...item,
-    gender: Math.random() < 0.5 ? "남성" : "여성",
-    maskedPhone: displayMaskedPhone(item.maskedPhone),
-  }));
+function byLatest(list: StatusItem[]) {
+  return [...list]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .map((item) => ({
+      ...item,
+      maskedPhone: displayMaskedPhone(item.maskedPhone),
+    }));
 }
 
 function displayMaskedPhone(phone: string) {
@@ -57,18 +49,36 @@ function displayMaskedPhone(phone: string) {
   return `${digits.slice(0, 3)}-***-*${digits.slice(-3)}`;
 }
 
+function StatusRows({ items }: { items: StatusItem[] }) {
+  if (items.length === 0) {
+    return <p className="status-empty">아직 접수된 상담이 없습니다.</p>;
+  }
+  return (
+    <ul className="status-list">
+      {items.map((item) => (
+        <li key={item.id}>
+          <span className="status-phone">{item.maskedPhone}</span>
+          <span className="status-meta">{item.gender}</span>
+          <span className="status-badge">{item.status}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function HomeHero() {
-  const [items, setItems] = useState<StatusItem[]>(() => mixStatus(DEMO_STATUS));
+  const [items, setItems] = useState<StatusItem[]>(() => byLatest(DEMO_STATUS));
   const [payOpen, setPayOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const loadStatus = useCallback(() => {
     fetch("/api/lead-status")
       .then((res) => res.json())
       .then((data: { items?: StatusItem[] }) => {
         const next = data.items || [];
-        setItems(mixStatus(next.length >= 8 ? next : DEMO_STATUS));
+        setItems(byLatest(next.length ? next : DEMO_STATUS));
       })
-      .catch(() => setItems(mixStatus(DEMO_STATUS)));
+      .catch(() => setItems(byLatest(DEMO_STATUS)));
   }, []);
 
   useEffect(() => {
@@ -90,19 +100,16 @@ export default function HomeHero() {
           <div className="status-board">
             <div className="status-head">
               <p className="eyebrow">LIVE STATUS</p>
-              <h2>접수 현황</h2>
+              <div className="status-title-row">
+                <h2>접수 현황</h2>
+                <button type="button" className="status-detail-btn" onClick={() => setDetailOpen(true)}>
+                  상세
+                </button>
+              </div>
               <p>최근 접수된 상담 현황입니다. 번호는 일부만 공개됩니다.</p>
             </div>
             <div className="status-scroll">
-              <ul className="status-list">
-                {[...items, ...items].map((item, index) => (
-                  <li key={`${item.id}-${index}`}>
-                    <span className="status-phone">{item.maskedPhone}</span>
-                    <span className="status-meta">{item.gender}</span>
-                    <span className="status-badge">{item.status}</span>
-                  </li>
-                ))}
-              </ul>
+              <StatusRows items={items.slice(0, 5)} />
             </div>
             <p className="status-foot">👥 오늘도 고객님의 보험을 하나씩 확인하고 있습니다</p>
           </div>
@@ -145,6 +152,26 @@ export default function HomeHero() {
         </div>
         </div>
       </div>
+
+      {detailOpen ? (
+        <div className="modal-back" onClick={() => setDetailOpen(false)}>
+          <div
+            className="modal status-detail-modal"
+            role="dialog"
+            aria-labelledby="status-detail-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button type="button" className="modal-close" onClick={() => setDetailOpen(false)}>
+              닫기
+            </button>
+            <h3 id="status-detail-title">접수 현황 전체</h3>
+            <p className="modal-sub">최근 접수된 상담을 모두 확인할 수 있습니다. 번호는 일부만 공개됩니다.</p>
+            <div className="status-detail-list">
+              <StatusRows items={items} />
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {payOpen ? <PayFlow onClose={() => setPayOpen(false)} /> : null}
     </section>

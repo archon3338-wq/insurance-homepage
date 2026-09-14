@@ -33,7 +33,6 @@ export async function listLeadStatus() {
   const store = await readStore();
   return store.items
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, 20)
     .map((item) => ({
       ...item,
       maskedPhone: maskPhone(item.maskedPhone),

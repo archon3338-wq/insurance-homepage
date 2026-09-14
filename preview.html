@@ -37,7 +37,10 @@
             <div class="status-board">
               <div class="status-head">
                 <p class="eyebrow">LIVE STATUS</p>
-                <h2>접수 현황</h2>
+                <div class="status-title-row">
+                  <h2>접수 현황</h2>
+                  <button type="button" class="status-detail-btn" id="openStatusDetail">상세</button>
+                </div>
                 <p>최근 접수된 상담 현황입니다. 번호는 일부만 공개됩니다.</p>
               </div>
               <div class="status-scroll">
@@ -115,6 +118,17 @@
             <button type="submit" class="pay-btn">입사문의 보내기</button>
             <p class="msg ok" id="joinMsg"></p>
           </form>
+        </div>
+      </div>
+
+      <div class="modal-back" id="statusDetailModal" hidden>
+        <div class="modal status-detail-modal" role="dialog">
+          <button type="button" class="modal-close" id="closeStatusDetail">닫기</button>
+          <h3>접수 현황 전체</h3>
+          <p class="modal-sub">최근 접수된 상담을 모두 확인할 수 있습니다. 번호는 일부만 공개됩니다.</p>
+          <div class="status-detail-list">
+            <ul class="status-list" id="statusDetailList"></ul>
+          </div>
         </div>
       </div>
 
@@ -242,6 +256,47 @@
       </div>
 
     <main>
+      <section class="sample-report">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="eyebrow">HOW WE ANALYZE</p>
+            <h2>내 보험 이렇게 확인해 드려요</h2>
+            <p class="section-lead">실제 상담에서 드리는 분석 파일 예시입니다. 개인 정보는 가린 상태로 보여 드립니다.</p>
+          </div>
+          <div class="sample-grid">
+            <article class="sample-card">
+              <div class="sample-thumb">
+                <img src="./public/sample-cover-table.png" alt="보장 금액 현황 분석 예시" />
+                <span class="sample-blur-tag">개인정보 보호</span>
+              </div>
+              <strong>보장 금액 한눈에 비교</strong>
+              <p>현재 가입 금액과 목표 금액을 항목별로 비교해, 부족한지 충분한지 판정해 드립니다.</p>
+            </article>
+            <article class="sample-card">
+              <div class="sample-thumb">
+                <img src="./public/sample-cover-bars.png" alt="핵심 보장 그래프 예시" />
+                <span class="sample-blur-tag">개인정보 보호</span>
+              </div>
+              <strong>핵심 보장·수술 그래프</strong>
+              <p>핵심 보장을 그래프로 보여 드려, 어디에 공백이 있는지 바로 확인하실 수 있습니다.</p>
+            </article>
+            <article class="sample-card">
+              <div class="sample-thumb">
+                <img src="./public/sample-cover-summary.png" alt="한 줄 요약과 보험료 구성 예시" />
+                <span class="sample-blur-tag">개인정보 보호</span>
+              </div>
+              <strong>한 줄 요약과 보험료 구성</strong>
+              <p>빠진 보장, 실손 유지 여부, 월 보험료 등을 정리해 다음에 무엇을 손볼지 안내드립니다.</p>
+            </article>
+          </div>
+          <ul class="sample-notes">
+            <li>가입하신 보험을 표와 그래프로 정리해, 지금 보장과 목표 보장을 비교해 드립니다.</li>
+            <li>부족·충분·과잉을 구분해 드면서 소비자 중심적인, 객관적으로 분석해 드립니다.</li>
+            <li>상담 후에는 실제 분석 파일을 제공해, 같은 자료로 계속 확인하실 수 있습니다.</li>
+          </ul>
+        </div>
+      </section>
+
       <section class="reasons">
         <div class="wrap">
           <div class="section-head">
@@ -348,29 +403,27 @@
         { phone: "010-***-*067", gender: "남성", status: "상담완료", time: "9. 1. 18:44" }
       ];
 
-      function shuffle(list) {
-        var next = list.slice();
-        for (var i = next.length - 1; i > 0; i--) {
-          var j = Math.floor(Math.random() * (i + 1));
-          var t = next[i];
-          next[i] = next[j];
-          next[j] = t;
-        }
-        return next;
+      function statusItemHtml(item) {
+        return '<li><span class="status-phone">' + item.phone + '</span><span class="status-meta">' +
+          item.gender + '</span><span class="status-badge">' + item.status + "</span></li>";
       }
-
-      demo = shuffle(demo).map(function (item) {
-        return Object.assign({}, item, { gender: Math.random() < 0.5 ? "남성" : "여성" });
-      });
 
       function renderStatus() {
-        var html = demo.map(function (item) {
-          return '<li><span class="status-phone">' + item.phone + '</span><span class="status-meta">' +
-            item.gender + '</span><span class="status-badge">' + item.status + "</span></li>";
-        }).join("");
-        document.getElementById("statusList").innerHTML = html + html;
+        document.getElementById("statusList").innerHTML = demo.slice(0, 5).map(statusItemHtml).join("");
+        document.getElementById("statusDetailList").innerHTML = demo.map(statusItemHtml).join("");
       }
       renderStatus();
+
+      var statusDetailModal = document.getElementById("statusDetailModal");
+      document.getElementById("openStatusDetail").addEventListener("click", function () {
+        statusDetailModal.hidden = false;
+      });
+      document.getElementById("closeStatusDetail").addEventListener("click", function () {
+        statusDetailModal.hidden = true;
+      });
+      statusDetailModal.addEventListener("click", function (e) {
+        if (e.target === statusDetailModal) statusDetailModal.hidden = true;
+      });
 
       var payModal = document.getElementById("payModal");
       var policyModal = document.getElementById("policyModal");
