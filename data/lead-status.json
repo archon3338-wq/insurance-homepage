@@ -1,6 +1,13 @@
 {
   "items": [
     {
+      "id": "1789440625082-mqsc",
+      "maskedPhone": "010-***-*479",
+      "gender": "여성",
+      "status": "접수완료",
+      "createdAt": "2026-09-15T02:50:25.082Z"
+    },
+    {
       "id": "demo-1",
       "maskedPhone": "010-***-*010",
       "gender": "여성",
