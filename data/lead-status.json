@@ -2,7 +2,7 @@
   "items": [
     {
       "id": "demo-1",
-      "maskedPhone": "010-***-*821",
+      "maskedPhone": "010-***-*010",
       "gender": "여성",
       "status": "접수완료",
       "createdAt": "2026-09-02T04:10:00.000Z"
