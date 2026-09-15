@@ -191,11 +191,11 @@ export default function AdminStatusPage() {
 
           <div className="admin-token-box">
             <p>
-              1.{" "}
+              1. GitHub에서 <strong>archon3338-wq</strong> 계정으로 로그인한 다음,{" "}
               <a href={LEAD_GITHUB_TOKEN_URL} target="_blank" rel="noreferrer">
                 이 링크에서 Generate token
               </a>
-              을 누릅니다. (만료 기간은 아무거나 선택)
+              을 누릅니다.
             </p>
             <p>2. 나온 토큰을 붙여넣고, 지금 저장을 누릅니다. 이 컴퓨터에만 기억됩니다.</p>
             <input

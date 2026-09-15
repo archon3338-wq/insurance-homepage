@@ -3,7 +3,7 @@ export const LEAD_GITHUB_PATH = "data/lead-status.json";
 export const LEAD_GITHUB_BRANCH = "main";
 export const LEAD_GITHUB_TOKEN_KEY = "irecare-github-token";
 export const LEAD_GITHUB_TOKEN_URL =
-  "https://github.com/settings/tokens/new?description=irecare-status&scopes=public_repo";
+  "https://github.com/settings/tokens/new?description=irecare-status&scopes=repo";
 
 const CONTENTS_URL = `https://api.github.com/repos/${LEAD_GITHUB_REPO}/contents/${LEAD_GITHUB_PATH}`;
 

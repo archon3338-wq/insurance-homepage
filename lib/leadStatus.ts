@@ -12,8 +12,8 @@ export type LeadStatusItem = {
 type Store = { items: LeadStatusItem[] };
 
 const dataPath = path.join(process.cwd(), "data", "lead-status.json");
-const GITHUB_REPO = process.env.GITHUB_REPO || "archon3338-wq/insurance-homepage";
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH || "main";
+const GITHUB_REPO = "archon3338-wq/insurance-homepage";
+const GITHUB_BRANCH = "main";
 const GITHUB_FILE = "data/lead-status.json";
 
 export const LEAD_STATUSES = ["접수완료", "상담대기", "상담완료"] as const;
@@ -119,30 +119,55 @@ async function writeToGitHub(store: Store, token = githubToken()) {
   const writeToken = normalizeGithubToken(token);
   if (!writeToken) return false;
   const api = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
-  const current = await fetch(`${api}?ref=${GITHUB_BRANCH}`, {
-    headers: githubHeaders(),
+
+  let current = await fetch(`${api}?ref=${GITHUB_BRANCH}`, {
+    headers: githubHeaders(writeToken),
     cache: "no-store",
   });
-  if (!current.ok) throw new Error(await githubErrorMessage(current));
+  if (!current.ok) {
+    current = await fetch(`${api}?ref=${GITHUB_BRANCH}`, {
+      headers: githubHeaders(),
+      cache: "no-store",
+    });
+  }
+  if (!current.ok) {
+    throw new Error(
+      `저장소를 읽지 못했습니다 (${current.status}). GitHub에서 archon3338-wq 계정으로 로그인한 뒤 토큰을 다시 만들어 주세요.`,
+    );
+  }
   const currentJson = (await current.json()) as { sha?: string };
   const content = Buffer.from(JSON.stringify(store, null, 2), "utf8").toString("base64");
-  const res = await fetch(api, {
-    method: "PUT",
-    headers: {
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "irecare-lead-status",
-      Authorization: `Bearer ${writeToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      message: "update lead status",
-      content,
-      sha: currentJson.sha,
-      branch: GITHUB_BRANCH,
-    }),
+  const body = JSON.stringify({
+    message: "update lead status",
+    content,
+    sha: currentJson.sha,
+    branch: GITHUB_BRANCH,
   });
-  if (!res.ok) throw new Error(await githubErrorMessage(res));
+
+  const headers = {
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": "irecare-lead-status",
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${writeToken}`,
+  };
+
+  let res = await fetch(api, { method: "PUT", headers, body, cache: "no-store" });
+  if (res.status === 401 || res.status === 404) {
+    res = await fetch(api, {
+      method: "PUT",
+      headers: { ...headers, Authorization: `token ${writeToken}` },
+      body,
+      cache: "no-store",
+    });
+  }
+  if (!res.ok) {
+    throw new Error(
+      res.status === 404
+        ? "토큰을 만든 GitHub 계정이 저장소 계정과 다릅니다. github.com/archon3338-wq 으로 로그인한 다음 토큰을 다시 만들어 주세요."
+        : await githubErrorMessage(res),
+    );
+  }
   return true;
 }
 
