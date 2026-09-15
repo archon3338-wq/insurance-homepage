@@ -3,6 +3,12 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import SiteHeader from "../../SiteHeader";
+import {
+  LEAD_GITHUB_TOKEN_KEY,
+  LEAD_GITHUB_TOKEN_URL,
+  loadLeadStatusFromGitHub,
+  saveLeadStatusToGitHub,
+} from "@/lib/githubLead";
 
 type Row = {
   id: string;
@@ -37,21 +43,39 @@ function emptyRow(): Row {
   };
 }
 
+function maskPhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 6) return phone.trim() || "010-***-****";
+  return `${digits.slice(0, 3)}-***-*${digits.slice(-3)}`;
+}
+
+function readStoredToken() {
+  try {
+    return window.localStorage.getItem(LEAD_GITHUB_TOKEN_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
 export default function AdminStatusPage() {
   const [items, setItems] = useState<Row[]>([]);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [token, setToken] = useState("");
   const [message, setMessage] = useState("내용을 고치면 자동으로 저장됩니다.");
   const [ok, setOk] = useState(true);
   const readyRef = useRef(false);
 
   const loadItems = useCallback(async () => {
-    const res = await fetch("/api/lead-status", { cache: "no-store" });
-    const data = (await res.json()) as {
-      items?: Array<{ id: string; maskedPhone: string; gender: string; status: string; createdAt: string }>;
-    };
+    const fromGitHub = await loadLeadStatusFromGitHub().catch(() => []);
+    const source = fromGitHub.length
+      ? fromGitHub
+      : await fetch("/api/lead-status", { cache: "no-store" })
+          .then((res) => res.json())
+          .then((data: { items?: Array<{ id: string; maskedPhone: string; gender: string; status: string; createdAt: string }> }) => data.items || []);
+
     setItems(
-      (data.items || []).map((item) => ({
+      source.map((item) => ({
         id: item.id,
         phone: item.maskedPhone,
         gender: item.gender === "남성" ? "남성" : "여성",
@@ -66,6 +90,7 @@ export default function AdminStatusPage() {
   }, []);
 
   useEffect(() => {
+    setToken(readStoredToken());
     loadItems().catch(() => {
       setOk(false);
       setMessage("접수현황을 불러오지 못했습니다.");
@@ -74,15 +99,34 @@ export default function AdminStatusPage() {
 
   const save = useCallback(async () => {
     setSaving(true);
+    const payload = items.map((item) => ({
+      id: item.id,
+      maskedPhone: maskPhone(item.phone),
+      gender: item.gender,
+      status: item.status,
+      createdAt: item.createdAt,
+    }));
     try {
+      const nextToken = token.trim();
+      if (nextToken) {
+        window.localStorage.setItem(LEAD_GITHUB_TOKEN_KEY, nextToken);
+        await saveLeadStatusToGitHub(nextToken, payload);
+        setItems((prev) => prev.map((item) => ({ ...item, phone: maskPhone(item.phone) })));
+        setDirty(false);
+        setOk(true);
+        setMessage("저장했습니다. 홈을 새로고침하면 접수현황이 바뀝니다.");
+        return;
+      }
+
       const res = await fetch("/api/admin/lead-status", {
         method: "PUT",
         cache: "no-store",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: items.map((item) => ({
+          githubToken: nextToken,
+          items: payload.map((item) => ({
             id: item.id,
-            phone: item.phone,
+            phone: item.maskedPhone,
             gender: item.gender,
             status: item.status,
             createdAt: item.createdAt,
@@ -95,7 +139,7 @@ export default function AdminStatusPage() {
       };
       if (!res.ok) {
         setOk(false);
-        setMessage(data.error || "저장에 실패했습니다.");
+        setMessage(data.error || "아래 칸에 GitHub 토큰을 붙여넣은 뒤 다시 저장해 주세요.");
         return;
       }
       if (data.items) {
@@ -112,19 +156,19 @@ export default function AdminStatusPage() {
       setMessage("저장했습니다. 홈 접수현황에 바로 반영됩니다.");
     } catch {
       setOk(false);
-      setMessage("네트워크 오류가 발생했습니다.");
+      setMessage("아래 칸에 GitHub 토큰을 붙여넣은 뒤 다시 저장해 주세요.");
     } finally {
       setSaving(false);
     }
-  }, [items]);
+  }, [items, token]);
 
   useEffect(() => {
-    if (!readyRef.current || !dirty) return;
+    if (!readyRef.current || !dirty || !token.trim()) return;
     const timer = window.setTimeout(() => {
       void save();
     }, 800);
     return () => window.clearTimeout(timer);
-  }, [dirty, items, save]);
+  }, [dirty, items, save, token]);
 
   function updateRow(id: string, patch: Partial<Row>) {
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
@@ -139,8 +183,8 @@ export default function AdminStatusPage() {
           <p className="eyebrow">ADMIN</p>
           <h1>접수현황 관리</h1>
           <p className="intro">
-            이 주소(<a href="https://www.irecare.com/admin/status">www.irecare.com/admin/status</a>)에서
-            저장해야 실제 홈 접수현황에 반영됩니다. 번호를 고치면 자동으로 가려지고 저장됩니다.
+            번호를 고친 뒤 저장하면 홈 접수현황에 반영됩니다. 처음 한 번만 아래 GitHub 토큰을
+            붙여넣으면 됩니다.
           </p>
           <div className="admin-nav">
             <Link className="admin-nav-link on" href="/admin/status">
@@ -149,6 +193,24 @@ export default function AdminStatusPage() {
             <Link className="admin-nav-link" href="/admin">
               자료 올리기
             </Link>
+          </div>
+
+          <div className="admin-token-box">
+            <p>
+              1.{" "}
+              <a href={LEAD_GITHUB_TOKEN_URL} target="_blank" rel="noreferrer">
+                이 링크에서 Generate token
+              </a>
+              을 누릅니다. (만료 기간은 아무거나 선택)
+            </p>
+            <p>2. 나온 토큰을 붙여넣고, 지금 저장을 누릅니다. 이 컴퓨터에만 기억됩니다.</p>
+            <input
+              type="password"
+              value={token}
+              placeholder="ghp_ 로 시작하는 토큰"
+              autoComplete="off"
+              onChange={(e) => setToken(e.target.value)}
+            />
           </div>
 
           <div className="admin-status-toolbar">

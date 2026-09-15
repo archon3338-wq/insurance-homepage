@@ -329,6 +329,26 @@ body:not(:has(.home-shell)) .topbar {
   margin: 0;
 }
 
+.admin-token-box {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  background: #f7f8f7;
+  border-radius: 14px;
+}
+
+.admin-token-box p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.admin-token-box input {
+  max-width: 520px;
+  margin: 0;
+}
+
 .admin-status-table-wrap {
   overflow: auto;
   background: #fff;

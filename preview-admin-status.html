@@ -29,13 +29,19 @@
         <p class="eyebrow">ADMIN</p>
         <h1>접수현황 관리</h1>
         <p class="intro">
-          수정한 뒤 <strong>지금 저장</strong>을 누르면
+          처음 한 번만 GitHub 토큰을 붙여넣으면, <strong>지금 저장</strong>이
           <a href="https://www.irecare.com/" target="_blank" rel="noreferrer">www.irecare.com</a>
-          접수현황에도 저장됩니다. 비밀번호는 필요 없습니다.
+          접수현황에도 반영됩니다.
         </p>
         <div class="admin-nav">
           <a class="admin-nav-link on" href="./preview-admin-status.html">접수현황</a>
           <a class="admin-nav-link" href="./preview.html">자료 올리기</a>
+        </div>
+
+        <div class="admin-token-box">
+          <p>1. <a href="https://github.com/settings/tokens/new?description=irecare-status&scopes=public_repo" target="_blank" rel="noreferrer">이 링크에서 Generate token</a>을 누릅니다.</p>
+          <p>2. 나온 토큰을 붙여넣고 지금 저장을 누릅니다.</p>
+          <input type="password" id="githubToken" placeholder="ghp_ 로 시작하는 토큰" autocomplete="off" />
         </div>
 
         <div class="admin-status-toolbar">
@@ -63,8 +69,8 @@
 
     <script>
       var KEY = "irecare-lead-status";
-      var LIVE_GET = "https://www.irecare.com/api/lead-status";
-      var LIVE_PUT = "https://www.irecare.com/api/admin/lead-status";
+      var TOKEN_KEY = "irecare-github-token";
+      var GITHUB_FILE = "https://api.github.com/repos/archon3338-wq/insurance-homepage/contents/data/lead-status.json";
       var fallback = [
         { id: "demo-1", phone: "010-***-*821", gender: "여성", status: "접수완료", createdAt: "2026-09-02T13:10" },
         { id: "demo-2", phone: "010-***-*193", gender: "남성", status: "상담대기", createdAt: "2026-09-02T12:42" },
@@ -110,30 +116,71 @@
         });
       }
 
+      function utf8ToBase64(text) {
+        var bytes = new TextEncoder().encode(text);
+        var binary = "";
+        bytes.forEach(function (byte) { binary += String.fromCharCode(byte); });
+        return btoa(binary);
+      }
+
       function saveItems(items) {
         localStorage.setItem(KEY, JSON.stringify({ items: items }));
         var msg = document.getElementById("saveMsg");
+        var token = (document.getElementById("githubToken").value || "").trim();
+        if (token) localStorage.setItem(TOKEN_KEY, token);
+        if (!token) {
+          msg.className = "msg err";
+          msg.textContent = "아래 칸에 GitHub 토큰을 붙여넣은 뒤 다시 저장해 주세요.";
+          return;
+        }
         msg.className = "msg ok";
-        msg.textContent = "이 컴퓨터에 저장했습니다. 실제 사이트에 올리는 중...";
-        fetch(LIVE_PUT, {
-          method: "PUT",
+        msg.textContent = "실제 사이트에 저장하는 중...";
+        var payload = {
+          items: items.map(function (item) {
+            return {
+              id: item.id,
+              maskedPhone: maskPhone(item.phone),
+              gender: item.gender,
+              status: item.status,
+              createdAt: item.createdAt
+            };
+          })
+        };
+        fetch(GITHUB_FILE + "?ref=main", {
           cache: "no-store",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: items })
+          headers: {
+            Accept: "application/vnd.github+json",
+            Authorization: "Bearer " + token,
+            "User-Agent": "irecare-lead-status"
+          }
         })
-          .then(function (res) {
-            return res.json().then(function (data) {
-              return { ok: res.ok, data: data };
+          .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+          .then(function (current) {
+            if (!current.ok) throw new Error("token");
+            return fetch(GITHUB_FILE, {
+              method: "PUT",
+              headers: {
+                Accept: "application/vnd.github+json",
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json",
+                "User-Agent": "irecare-lead-status"
+              },
+              body: JSON.stringify({
+                message: "update lead status",
+                content: utf8ToBase64(JSON.stringify(payload, null, 2)),
+                sha: current.data.sha,
+                branch: "main"
+              })
             });
           })
-          .then(function (result) {
-            if (!result.ok) throw new Error(result.data && result.data.error);
+          .then(function (res) {
+            if (!res.ok) throw new Error("token");
             msg.className = "msg ok";
             msg.textContent = "실제 사이트(irecare.com)에 저장했습니다. 홈을 새로고침하면 접수현황이 바뀝니다.";
           })
           .catch(function () {
             msg.className = "msg err";
-            msg.textContent = "이 컴퓨터에는 저장했습니다. 실제 사이트 저장은 https://www.irecare.com/admin/status 에서 해 주세요.";
+            msg.textContent = "GitHub 토큰이 올바른지 확인해 주세요.";
           });
       }
 
@@ -179,11 +226,19 @@
         saveItems(items);
       });
       render();
-      fetch(LIVE_GET, { cache: "no-store" })
+      try {
+        document.getElementById("githubToken").value = localStorage.getItem(TOKEN_KEY) || "";
+      } catch (e) {}
+      fetch(GITHUB_FILE + "?ref=main&t=" + Date.now(), {
+        cache: "no-store",
+        headers: { Accept: "application/vnd.github+json", "User-Agent": "irecare-lead-status" }
+      })
         .then(function (res) { return res.json(); })
-        .then(function (data) {
-          if (data && Array.isArray(data.items) && data.items.length) {
-            items = data.items.map(function (item) {
+        .then(function (file) {
+          if (!file || !file.content) return;
+          var parsed = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, "")))));
+          if (parsed && Array.isArray(parsed.items) && parsed.items.length) {
+            items = parsed.items.map(function (item) {
               return {
                 id: item.id,
                 phone: item.maskedPhone || item.phone,
@@ -192,8 +247,8 @@
                 createdAt: toLocal(item.createdAt)
               };
             });
+            render();
           }
-          render();
         })
         .catch(function () { render(); });
     </script>

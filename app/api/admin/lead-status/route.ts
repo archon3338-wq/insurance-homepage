@@ -17,6 +17,7 @@ export async function GET() {
 export async function PUT(request: Request) {
   try {
     const body = (await request.json()) as {
+      githubToken?: string;
       items?: Array<{
         id?: string;
         phone?: string;
@@ -31,7 +32,7 @@ export async function PUT(request: Request) {
       return jsonNoStore({ error: "접수현황 데이터가 올바르지 않습니다." }, 400);
     }
 
-    const items = await replaceLeadStatus(body.items);
+    const items = await replaceLeadStatus(body.items, body.githubToken?.trim());
     return jsonNoStore({ ok: true, items });
   } catch (error) {
     const message = error instanceof Error ? error.message : "저장에 실패했습니다.";

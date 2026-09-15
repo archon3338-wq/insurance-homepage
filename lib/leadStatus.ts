@@ -94,8 +94,7 @@ async function readFromGitHub(): Promise<Store | null> {
   }
 }
 
-async function writeToGitHub(store: Store) {
-  const token = githubToken();
+async function writeToGitHub(store: Store, token = githubToken()) {
   if (!token) return false;
   const api = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
   const current = await fetch(`${api}?ref=${GITHUB_BRANCH}`, {
@@ -143,9 +142,9 @@ async function readStore(): Promise<Store> {
   return readLocalStore();
 }
 
-async function writeStore(store: Store) {
+async function writeStore(store: Store, token?: string) {
   const remoteOk = await writeRemoteStore(store).catch(() => false);
-  const githubOk = await writeToGitHub(store).catch(() => false);
+  const githubOk = await writeToGitHub(store, token || githubToken()).catch(() => false);
   let localOk = false;
   try {
     await writeLocalStore(store);
@@ -156,9 +155,7 @@ async function writeStore(store: Store) {
 
   if (remoteOk || githubOk) return;
   if (localOk && !process.env.VERCEL) return;
-  throw new Error(
-    "실제 사이트에 저장하려면 Vercel에 GITHUB_TOKEN 환경변수가 필요합니다.",
-  );
+  throw new Error("GitHub 토큰을 입력하면 실제 사이트에 저장됩니다.");
 }
 
 export async function listLeadStatus() {
@@ -195,6 +192,7 @@ export async function replaceLeadStatus(
     status?: string;
     createdAt?: string;
   }>,
+  token?: string,
 ) {
   const next: LeadStatusItem[] = items.slice(0, 50).map((item, index) => {
     const gender = item.gender === "남성" || item.gender === "여성" ? item.gender : "여성";
@@ -213,6 +211,6 @@ export async function replaceLeadStatus(
   });
 
   const store = { items: next.sort((a, b) => b.createdAt.localeCompare(a.createdAt)) };
-  await writeStore(store);
+  await writeStore(store, token);
   return store.items;
 }

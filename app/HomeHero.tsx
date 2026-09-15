@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import PayFlow from "./PayFlow";
+import { loadLeadStatusFromGitHub } from "@/lib/githubLead";
 
 type StatusItem = {
   id: string;
@@ -72,10 +73,13 @@ export default function HomeHero() {
   const [detailOpen, setDetailOpen] = useState(false);
 
   const loadStatus = useCallback(() => {
-    fetch("/api/lead-status", { cache: "no-store" })
-      .then((res) => res.json())
-      .then((data: { items?: StatusItem[] }) => {
-        const next = data.items || [];
+    loadLeadStatusFromGitHub()
+      .catch(() =>
+        fetch("/api/lead-status", { cache: "no-store" })
+          .then((res) => res.json())
+          .then((data: { items?: StatusItem[] }) => data.items || []),
+      )
+      .then((next) => {
         setItems(byLatest(next.length ? next : DEMO_STATUS));
       })
       .catch(() => setItems(byLatest(DEMO_STATUS)));
