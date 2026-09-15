@@ -176,8 +176,9 @@ export default function AdminStatusPage() {
           <p className="eyebrow">ADMIN</p>
           <h1>접수현황 관리</h1>
           <p className="intro">
-            번호를 고친 뒤 저장하면 홈 접수현황에 반영됩니다. 처음 한 번만 아래 GitHub 토큰을
-            붙여넣으면 됩니다.
+            여기서 저장하면 홈 접수현황은 컴퓨터·휴대폰 어디서든 같이 바뀝니다.
+            토큰은 이 관리 화면에서 수정할 때만 필요합니다. 다른 컴퓨터에서 수정할 때도
+            같은 토큰을 한 번 붙여넣으면 됩니다.
           </p>
           <div className="admin-nav">
             <Link className="admin-nav-link on" href="/admin/status">

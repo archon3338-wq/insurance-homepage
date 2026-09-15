@@ -58,12 +58,21 @@ function normalizeGithubToken(token: string) {
   return token.trim().replace(/^Bearer\s+/i, "").replace(/^["']|["']$/g, "");
 }
 
-function githubWriteError(status: number) {
-  if (status === 401) return "토큰이 올바르지 않습니다. 복사한 값을 다시 붙여넣어 주세요.";
+function githubWriteError(status: number, detail = "") {
+  if (status === 401) return "토큰이 올바르지 않습니다. Generate token에서 나온 값을 다시 복사해 붙여넣어 주세요.";
   if (status === 403) return "토큰 권한이 없습니다. 토큰을 만들 때 repo 항목이 체크되어 있어야 합니다.";
-  if (status === 404) return "저장소에 접근하지 못했습니다. GitHub 계정을 확인해 주세요.";
+  if (status === 404) return "저장소에 접근하지 못했습니다. GitHub에 로그인한 계정을 확인해 주세요.";
   if (status === 409) return "잠시 후 다시 지금 저장을 눌러 주세요.";
-  return "저장에 실패했습니다. 토큰을 다시 확인해 주세요.";
+  return detail ? `저장에 실패했습니다. (${detail})` : "저장에 실패했습니다. 토큰을 다시 확인해 주세요.";
+}
+
+async function githubErrorMessage(res: Response) {
+  try {
+    const data = (await res.json()) as { message?: string };
+    return githubWriteError(res.status, data.message || "");
+  } catch {
+    return githubWriteError(res.status);
+  }
 }
 
 async function readRemoteStore(): Promise<Store | null> {
@@ -111,16 +120,19 @@ async function writeToGitHub(store: Store, token = githubToken()) {
   if (!writeToken) return false;
   const api = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
   const current = await fetch(`${api}?ref=${GITHUB_BRANCH}`, {
-    headers: githubHeaders(writeToken),
+    headers: githubHeaders(),
     cache: "no-store",
   });
-  if (!current.ok) throw new Error(githubWriteError(current.status));
+  if (!current.ok) throw new Error(await githubErrorMessage(current));
   const currentJson = (await current.json()) as { sha?: string };
   const content = Buffer.from(JSON.stringify(store, null, 2), "utf8").toString("base64");
   const res = await fetch(api, {
     method: "PUT",
     headers: {
-      ...githubHeaders(writeToken),
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "irecare-lead-status",
+      Authorization: `Bearer ${writeToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -130,7 +142,7 @@ async function writeToGitHub(store: Store, token = githubToken()) {
       branch: GITHUB_BRANCH,
     }),
   });
-  if (!res.ok) throw new Error(githubWriteError(res.status));
+  if (!res.ok) throw new Error(await githubErrorMessage(res));
   return true;
 }
 
