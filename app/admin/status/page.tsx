@@ -7,7 +7,6 @@ import {
   LEAD_GITHUB_TOKEN_KEY,
   LEAD_GITHUB_TOKEN_URL,
   loadLeadStatusFromGitHub,
-  saveLeadStatusToGitHub,
 } from "@/lib/githubLead";
 
 type Row = {
@@ -110,12 +109,6 @@ export default function AdminStatusPage() {
       const nextToken = token.trim();
       if (nextToken) {
         window.localStorage.setItem(LEAD_GITHUB_TOKEN_KEY, nextToken);
-        await saveLeadStatusToGitHub(nextToken, payload);
-        setItems((prev) => prev.map((item) => ({ ...item, phone: maskPhone(item.phone) })));
-        setDirty(false);
-        setOk(true);
-        setMessage("저장했습니다. 홈을 새로고침하면 접수현황이 바뀝니다.");
-        return;
       }
 
       const res = await fetch("/api/admin/lead-status", {
@@ -139,7 +132,7 @@ export default function AdminStatusPage() {
       };
       if (!res.ok) {
         setOk(false);
-        setMessage(data.error || "아래 칸에 GitHub 토큰을 붙여넣은 뒤 다시 저장해 주세요.");
+        setMessage(data.error || "저장에 실패했습니다. 토큰을 다시 확인해 주세요.");
         return;
       }
       if (data.items) {
@@ -153,10 +146,10 @@ export default function AdminStatusPage() {
       }
       setDirty(false);
       setOk(true);
-      setMessage("저장했습니다. 홈 접수현황에 바로 반영됩니다.");
+      setMessage("저장했습니다. 홈을 새로고침하면 접수현황이 바뀝니다.");
     } catch {
       setOk(false);
-      setMessage("아래 칸에 GitHub 토큰을 붙여넣은 뒤 다시 저장해 주세요.");
+      setMessage("네트워크 오류가 발생했습니다. 잠시 후 다시 저장해 주세요.");
     } finally {
       setSaving(false);
     }

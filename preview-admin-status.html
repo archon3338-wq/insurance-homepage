@@ -71,6 +71,7 @@
       var KEY = "irecare-lead-status";
       var TOKEN_KEY = "irecare-github-token";
       var GITHUB_FILE = "https://api.github.com/repos/archon3338-wq/insurance-homepage/contents/data/lead-status.json";
+      var LIVE_PUT = "https://www.irecare.com/api/admin/lead-status";
       var fallback = [
         { id: "demo-1", phone: "010-***-*821", gender: "여성", status: "접수완료", createdAt: "2026-09-02T13:10" },
         { id: "demo-2", phone: "010-***-*193", gender: "남성", status: "상담대기", createdAt: "2026-09-02T12:42" },
@@ -116,13 +117,6 @@
         });
       }
 
-      function utf8ToBase64(text) {
-        var bytes = new TextEncoder().encode(text);
-        var binary = "";
-        bytes.forEach(function (byte) { binary += String.fromCharCode(byte); });
-        return btoa(binary);
-      }
-
       function saveItems(items) {
         localStorage.setItem(KEY, JSON.stringify({ items: items }));
         var msg = document.getElementById("saveMsg");
@@ -135,52 +129,36 @@
         }
         msg.className = "msg ok";
         msg.textContent = "실제 사이트에 저장하는 중...";
-        var payload = {
-          items: items.map(function (item) {
-            return {
-              id: item.id,
-              maskedPhone: maskPhone(item.phone),
-              gender: item.gender,
-              status: item.status,
-              createdAt: item.createdAt
-            };
-          })
-        };
-        fetch(GITHUB_FILE + "?ref=main", {
+        fetch(LIVE_PUT, {
+          method: "PUT",
           cache: "no-store",
-          headers: {
-            Accept: "application/vnd.github+json",
-            Authorization: "Bearer " + token,
-            "User-Agent": "irecare-lead-status"
-          }
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            githubToken: token,
+            items: items.map(function (item) {
+              return {
+                id: item.id,
+                phone: maskPhone(item.phone),
+                gender: item.gender,
+                status: item.status,
+                createdAt: item.createdAt
+              };
+            })
+          })
         })
-          .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
-          .then(function (current) {
-            if (!current.ok) throw new Error("token");
-            return fetch(GITHUB_FILE, {
-              method: "PUT",
-              headers: {
-                Accept: "application/vnd.github+json",
-                Authorization: "Bearer " + token,
-                "Content-Type": "application/json",
-                "User-Agent": "irecare-lead-status"
-              },
-              body: JSON.stringify({
-                message: "update lead status",
-                content: utf8ToBase64(JSON.stringify(payload, null, 2)),
-                sha: current.data.sha,
-                branch: "main"
-              })
+          .then(function (res) {
+            return res.json().then(function (data) {
+              return { ok: res.ok, data: data };
             });
           })
-          .then(function (res) {
-            if (!res.ok) throw new Error("token");
+          .then(function (result) {
+            if (!result.ok) throw new Error(result.data && result.data.error);
             msg.className = "msg ok";
             msg.textContent = "실제 사이트(irecare.com)에 저장했습니다. 홈을 새로고침하면 접수현황이 바뀝니다.";
           })
-          .catch(function () {
+          .catch(function (err) {
             msg.className = "msg err";
-            msg.textContent = "GitHub 토큰이 올바른지 확인해 주세요.";
+            msg.textContent = (err && err.message) || "저장에 실패했습니다. 토큰을 다시 확인해 주세요.";
           });
       }
 

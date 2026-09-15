@@ -25,15 +25,6 @@ function githubHeaders(token?: string): HeadersInit {
   return headers;
 }
 
-export function utf8ToBase64(text: string) {
-  const bytes = new TextEncoder().encode(text);
-  let binary = "";
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte);
-  });
-  return btoa(binary);
-}
-
 export function base64ToUtf8(value: string) {
   const binary = atob(value.replace(/\n/g, ""));
   const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
@@ -50,31 +41,4 @@ export async function loadLeadStatusFromGitHub() {
   if (!data.content) throw new Error("접수현황을 불러오지 못했습니다.");
   const parsed = JSON.parse(base64ToUtf8(data.content)) as { items?: LeadStatusRow[] };
   return Array.isArray(parsed.items) ? parsed.items : [];
-}
-
-export async function saveLeadStatusToGitHub(token: string, items: LeadStatusRow[]) {
-  const current = await fetch(`${CONTENTS_URL}?ref=${LEAD_GITHUB_BRANCH}`, {
-    cache: "no-store",
-    headers: githubHeaders(token),
-  });
-  if (!current.ok) {
-    throw new Error("GitHub 토큰이 올바른지 확인해 주세요.");
-  }
-  const currentJson = (await current.json()) as { sha?: string };
-  const res = await fetch(CONTENTS_URL, {
-    method: "PUT",
-    headers: {
-      ...githubHeaders(token),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      message: "update lead status",
-      content: utf8ToBase64(JSON.stringify({ items }, null, 2)),
-      sha: currentJson.sha,
-      branch: LEAD_GITHUB_BRANCH,
-    }),
-  });
-  if (!res.ok) {
-    throw new Error("GitHub 토큰이 올바른지 확인해 주세요.");
-  }
 }

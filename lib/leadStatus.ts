@@ -54,6 +54,18 @@ function githubHeaders(token?: string): HeadersInit {
   return headers;
 }
 
+function normalizeGithubToken(token: string) {
+  return token.trim().replace(/^Bearer\s+/i, "").replace(/^["']|["']$/g, "");
+}
+
+function githubWriteError(status: number) {
+  if (status === 401) return "토큰이 올바르지 않습니다. 복사한 값을 다시 붙여넣어 주세요.";
+  if (status === 403) return "토큰 권한이 없습니다. 토큰을 만들 때 repo 항목이 체크되어 있어야 합니다.";
+  if (status === 404) return "저장소에 접근하지 못했습니다. GitHub 계정을 확인해 주세요.";
+  if (status === 409) return "잠시 후 다시 지금 저장을 눌러 주세요.";
+  return "저장에 실패했습니다. 토큰을 다시 확인해 주세요.";
+}
+
 async function readRemoteStore(): Promise<Store | null> {
   const url = remoteStoreUrl();
   if (!url) return null;
@@ -95,19 +107,20 @@ async function readFromGitHub(): Promise<Store | null> {
 }
 
 async function writeToGitHub(store: Store, token = githubToken()) {
-  if (!token) return false;
+  const writeToken = normalizeGithubToken(token);
+  if (!writeToken) return false;
   const api = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
   const current = await fetch(`${api}?ref=${GITHUB_BRANCH}`, {
-    headers: githubHeaders(token),
+    headers: githubHeaders(writeToken),
     cache: "no-store",
   });
-  if (!current.ok) return false;
+  if (!current.ok) throw new Error(githubWriteError(current.status));
   const currentJson = (await current.json()) as { sha?: string };
   const content = Buffer.from(JSON.stringify(store, null, 2), "utf8").toString("base64");
   const res = await fetch(api, {
     method: "PUT",
     headers: {
-      ...githubHeaders(token),
+      ...githubHeaders(writeToken),
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -117,7 +130,8 @@ async function writeToGitHub(store: Store, token = githubToken()) {
       branch: GITHUB_BRANCH,
     }),
   });
-  return res.ok;
+  if (!res.ok) throw new Error(githubWriteError(res.status));
+  return true;
 }
 
 async function readLocalStore(): Promise<Store> {
@@ -143,8 +157,18 @@ async function readStore(): Promise<Store> {
 }
 
 async function writeStore(store: Store, token?: string) {
+  const writeToken = normalizeGithubToken(token || githubToken());
   const remoteOk = await writeRemoteStore(store).catch(() => false);
-  const githubOk = await writeToGitHub(store, token || githubToken()).catch(() => false);
+  if (writeToken) {
+    await writeToGitHub(store, writeToken);
+    try {
+      await writeLocalStore(store);
+    } catch {
+      // GitHub 저장이 됐으면 실제 사이트에는 반영됩니다.
+    }
+    return;
+  }
+  const githubOk = await writeToGitHub(store).catch(() => false);
   let localOk = false;
   try {
     await writeLocalStore(store);
