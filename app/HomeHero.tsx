@@ -121,34 +121,29 @@ export default function HomeHero() {
 
         <div className="hero-col">
           <article className="inquiry-card" id="inquiry">
-            <h2 className="compare-title">무료상담 vs 유료상담</h2>
+            <h2 className="compare-title">기본상담 / 심화상담</h2>
+            <p className="compare-foot">
+              I RE:CARE는 기존 설계사 중심 상담이 아닌 고객 이익을 최우선으로 하며 가입권유는 하지 않습니다
+            </p>
             <div className="compare-box">
               <div className="compare-col free">
-                <h3>💬 무료 보험상담</h3>
+                <h3>기본상담</h3>
                 <ul>
-                  <li>고객 중심이 아닌 설계사 중심 상담</li>
-                  <li>기존보험 해지 후 새보험 가입 권유</li>
-                  <li>컨설팅이 아닌 상품 가입 권유</li>
-                  <li>상품가입 중심 상담</li>
+                  <li>내 보장분석만 정확히 알기</li>
+                  <li>내 보험 보상이 어떻게 나올지 파악</li>
+                  <li>분석 내용 PDF 파일 제공</li>
                 </ul>
               </div>
               <div className="compare-col paid">
-                <h3>✅ 유료 보험상담</h3>
+                <h3>심화상담</h3>
                 <ul>
-                  <li>고객의 이익을 최우선으로 객관적 분석</li>
-                  <li>필요한 보험과 중복보험 객관적 분석</li>
-                  <li>본인보험 분석 파일 제공</li>
-                  <li>보험 가입 권유 없는 100% 객관적 분석</li>
+                  <li>기본상담+심층분석</li>
+                  <li>철저한 고객중심</li>
+                  <li>정확한 재무상태에 따른 분석</li>
+                  <li>리모델링이 필요하신 분</li>
                 </ul>
               </div>
             </div>
-            <p className="compare-foot">
-              중요한 것은 상담료가 아니라,
-              <br />
-              <em className="em-red">잘못된 보험료 지출</em>을 얼마나 줄이고,
-              <br />
-              <em className="em-blue">내 보험을 정확하게 파악하고 있는지</em> 입니다
-            </p>
             <button type="button" className="inquiry-btn" onClick={() => setPayOpen(true)}>
               내 보험 확인하기 →
             </button>

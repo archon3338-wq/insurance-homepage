@@ -22,11 +22,7 @@ function isAdult(birthDate: string) {
 }
 
 function planLabel(plan: Plan) {
-  return plan === "basic" ? "베이직 심화분석 상담" : "프리미엄 심화분석 상담";
-}
-
-function planPrice(plan: Plan) {
-  return plan === "basic" ? "30,000원" : "100,000원";
+  return plan === "basic" ? "기본상담" : "심화상담";
 }
 
 export function PrivacyNotice() {
@@ -162,8 +158,8 @@ export default function PayFlow({ onClose }: PayFlowProps) {
 
         {step === "plan" ? (
           <>
-            <h3 id="pay-title">분석 상담 결제</h3>
-            <p className="modal-sub">원하시는 플랜의 금액을 눌러 주세요.</p>
+            <h3 id="pay-title">상담 신청</h3>
+            <p className="modal-sub">원하시는 상담을 눌러 주세요.</p>
             <div className="plan-grid">
               <label className={`plan ${plan === "basic" ? "on" : ""}`}>
                 <input
@@ -172,12 +168,11 @@ export default function PayFlow({ onClose }: PayFlowProps) {
                   checked={plan === "basic"}
                   onChange={() => setPlan("basic")}
                 />
-                <strong>베이직</strong>
-                <em>30,000원</em>
+                <strong>기본상담</strong>
                 <ul className="plan-points">
-                  <li>심화분석 상담</li>
-                  <li>분석 파일 제공(상세내용)</li>
-                  <li>보험 심화분석 자료+전화</li>
+                  <li>내 보험 알기</li>
+                  <li>내 보상 알기</li>
+                  <li>PDF 파일 제공</li>
                 </ul>
               </label>
               <label className={`plan ${plan === "premium" ? "on" : ""}`}>
@@ -187,24 +182,21 @@ export default function PayFlow({ onClose }: PayFlowProps) {
                   checked={plan === "premium"}
                   onChange={() => setPlan("premium")}
                 />
-                <strong>프리미엄</strong>
-                <em>100,000원</em>
+                <strong>심화상담</strong>
                 <ul className="plan-points">
-                  <li>심화분석 + 가족 보험 상담</li>
-                  <li>분석 파일 제공(상세내용)</li>
-                  <li>
-                    보험 심화분석 자료+전화or
-                    <span className="plan-hot">대면</span>
-                  </li>
+                  <li>기본상담+심층상담</li>
+                  <li>고객중심 상담</li>
+                  <li>재무상태분석</li>
+                  <li>리모델링 제안</li>
                 </ul>
               </label>
             </div>
             <div className="pay-amount-row">
               <button type="button" className="pay-btn" onClick={() => openAmount("basic")}>
-                30,000원
+                기본분석
               </button>
               <button type="button" className="pay-btn" onClick={() => openAmount("premium")}>
-                100,000원
+                심화상담
               </button>
             </div>
           </>
@@ -213,9 +205,9 @@ export default function PayFlow({ onClose }: PayFlowProps) {
         {step === "form" ? (
           <form className="pay-form" onSubmit={onSubmitForm}>
             <button type="button" className="pay-back" onClick={() => setStep("plan")}>
-              ← 금액 다시 선택
+              ← 상담 다시 선택
             </button>
-            <h3 id="pay-title">{planPrice(plan)} 결제 정보</h3>
+            <h3 id="pay-title">{planLabel(plan)} 신청 정보</h3>
             <p className="modal-sub">{planLabel(plan)} 진행을 위해 아래 정보를 입력해 주세요.</p>
 
             <div className="field">
@@ -286,7 +278,7 @@ export default function PayFlow({ onClose }: PayFlowProps) {
             </label>
 
             <button type="submit" className="pay-btn">
-              {planPrice(plan)} 결제하기
+              상담 신청하기
             </button>
             {message ? <p className="msg err">{message}</p> : null}
           </form>
@@ -294,32 +286,24 @@ export default function PayFlow({ onClose }: PayFlowProps) {
 
         {step === "pay" ? (
           <div className="pg-window">
-            <p className="pg-brand">안전결제</p>
-            <h3 id="pay-title">결제창</h3>
-            <p className="modal-sub">입력하신 정보로 결제를 진행합니다.</p>
+            <p className="pg-brand">상담 신청</p>
+            <h3 id="pay-title">신청 확인</h3>
+            <p className="modal-sub">입력하신 정보로 상담을 접수합니다.</p>
             <dl className="pg-summary">
               <div>
-                <dt>주문자</dt>
+                <dt>신청자</dt>
                 <dd>{name}</dd>
               </div>
               <div>
-                <dt>상품</dt>
+                <dt>상담</dt>
                 <dd>{planLabel(plan)}</dd>
-              </div>
-              <div>
-                <dt>결제금액</dt>
-                <dd className="pg-price">{planPrice(plan)}</dd>
-              </div>
-              <div>
-                <dt>결제수단</dt>
-                <dd>신용/체크카드</dd>
               </div>
             </dl>
             {payDone ? (
-              <p className="msg ok">결제 요청이 전달되었습니다. 상담사가 확인 후 연락드립니다.</p>
+              <p className="msg ok">신청이 전달되었습니다. 상담사가 확인 후 연락드립니다.</p>
             ) : (
               <button type="button" className="pay-btn" onClick={() => setPayDone(true)}>
-                {planPrice(plan)} 카드 결제
+                신청 완료
               </button>
             )}
           </div>
