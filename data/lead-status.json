@@ -25,7 +25,7 @@
       "id": "demo-1",
       "maskedPhone": "010-***-*010",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담중",
       "createdAt": "2026-09-02T04:10:00.000Z"
     },
     {
@@ -39,7 +39,7 @@
       "id": "demo-3",
       "maskedPhone": "010-***-*750",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담중",
       "createdAt": "2026-09-02T03:18:00.000Z"
     },
     {
@@ -67,7 +67,7 @@
       "id": "demo-7",
       "maskedPhone": "010-***-*714",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담중",
       "createdAt": "2026-09-02T01:47:00.000Z"
     },
     {
@@ -95,7 +95,7 @@
       "id": "demo-11",
       "maskedPhone": "010-***-*204",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담중",
       "createdAt": "2026-09-01T23:51:00.000Z"
     },
     {
@@ -123,7 +123,7 @@
       "id": "demo-15",
       "maskedPhone": "010-***-*948",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담중",
       "createdAt": "2026-09-01T21:37:00.000Z"
     },
     {
@@ -151,7 +151,7 @@
       "id": "demo-19",
       "maskedPhone": "010-***-*629",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담중",
       "createdAt": "2026-09-01T19:21:00.000Z"
     },
     {

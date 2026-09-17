@@ -75,7 +75,7 @@
       var fallback = [
         { id: "demo-1", phone: "010-***-*821", gender: "여성", status: "접수완료", createdAt: "2026-09-02T13:10" },
         { id: "demo-2", phone: "010-***-*193", gender: "남성", status: "상담대기", createdAt: "2026-09-02T12:42" },
-        { id: "demo-3", phone: "010-***-*750", gender: "여성", status: "접수완료", createdAt: "2026-09-02T12:18" },
+        { id: "demo-3", phone: "010-***-*750", gender: "여성", status: "상담중", createdAt: "2026-09-02T12:18" },
         { id: "demo-4", phone: "010-***-*608", gender: "남성", status: "상담완료", createdAt: "2026-09-02T11:55" },
         { id: "demo-5", phone: "010-***-*341", gender: "여성", status: "접수완료", createdAt: "2026-09-02T11:31" }
       ];
@@ -170,7 +170,7 @@
             "<tr data-id=\"" + item.id + "\">" +
               "<td><input type=\"tel\" value=\"" + (item.phone || "") + "\" /></td>" +
               "<td><select><option" + (item.gender === "여성" ? " selected" : "") + ">여성</option><option" + (item.gender === "남성" ? " selected" : "") + ">남성</option></select></td>" +
-              "<td><select><option" + (item.status === "접수완료" ? " selected" : "") + ">접수완료</option><option" + (item.status === "상담대기" ? " selected" : "") + ">상담대기</option><option" + (item.status === "상담완료" ? " selected" : "") + ">상담완료</option></select></td>" +
+              "<td><select><option" + (item.status === "접수완료" ? " selected" : "") + ">접수완료</option><option" + (item.status === "상담대기" ? " selected" : "") + ">상담대기</option><option" + (item.status === "상담중" ? " selected" : "") + ">상담중</option><option" + (item.status === "상담완료" ? " selected" : "") + ">상담완료</option></select></td>" +
               "<td><input type=\"datetime-local\" value=\"" + (item.createdAt || "") + "\" /></td>" +
               "<td><button type=\"button\" class=\"text-btn\">삭제</button></td>" +
             "</tr>"

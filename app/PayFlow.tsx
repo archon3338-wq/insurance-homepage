@@ -91,6 +91,8 @@ export default function PayFlow({ onClose }: PayFlowProps) {
   const [birthDate, setBirthDate] = useState("");
   const [gender, setGender] = useState("");
   const [phone, setPhone] = useState("");
+  const [job, setJob] = useState("");
+  const [note, setNote] = useState("");
   const [consent, setConsent] = useState(false);
   const [policyOpen, setPolicyOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -133,6 +135,10 @@ export default function PayFlow({ onClose }: PayFlowProps) {
     }
     if (phone.replace(/\D/g, "").length < 10) {
       setMessage("핸드폰번호를 올바르게 입력해 주세요.");
+      return;
+    }
+    if (plan === "premium" && job.trim().length < 1) {
+      setMessage("직업을 입력해 주세요.");
       return;
     }
     if (!consent) {
@@ -258,6 +264,31 @@ export default function PayFlow({ onClose }: PayFlowProps) {
                 required
               />
             </div>
+            {plan === "premium" ? (
+              <>
+                <div className="field">
+                  <label htmlFor="pay-job">직업</label>
+                  <input
+                    id="pay-job"
+                    type="text"
+                    placeholder="예: 회사원, 자영업"
+                    value={job}
+                    onChange={(e) => setJob(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="pay-note">기타(문의사항)</label>
+                  <textarea
+                    id="pay-note"
+                    rows={3}
+                    placeholder="궁금한 점을 적어 주세요"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                  />
+                </div>
+              </>
+            ) : null}
 
             <label className="consent">
               <input
@@ -298,6 +329,20 @@ export default function PayFlow({ onClose }: PayFlowProps) {
                 <dt>상담</dt>
                 <dd>{planLabel(plan)}</dd>
               </div>
+              {plan === "premium" ? (
+                <>
+                  <div>
+                    <dt>직업</dt>
+                    <dd>{job}</dd>
+                  </div>
+                  {note.trim() ? (
+                    <div>
+                      <dt>기타(문의사항)</dt>
+                      <dd>{note}</dd>
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
             </dl>
             {payDone ? (
               <p className="msg ok">신청이 전달되었습니다. 상담사가 확인 후 연락드립니다.</p>

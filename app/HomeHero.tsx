@@ -15,23 +15,23 @@ type StatusItem = {
 const DEMO_STATUS: StatusItem[] = [
   { id: "d1", maskedPhone: "010-***-*821", gender: "여성", status: "접수완료", createdAt: "2026-09-02T04:10:00.000Z" },
   { id: "d2", maskedPhone: "010-***-*193", gender: "남성", status: "상담대기", createdAt: "2026-09-02T03:42:00.000Z" },
-  { id: "d3", maskedPhone: "010-***-*750", gender: "여성", status: "접수완료", createdAt: "2026-09-02T03:18:00.000Z" },
+  { id: "d3", maskedPhone: "010-***-*750", gender: "여성", status: "상담중", createdAt: "2026-09-02T03:18:00.000Z" },
   { id: "d4", maskedPhone: "010-***-*608", gender: "남성", status: "상담완료", createdAt: "2026-09-02T02:55:00.000Z" },
   { id: "d5", maskedPhone: "010-***-*341", gender: "여성", status: "접수완료", createdAt: "2026-09-02T02:31:00.000Z" },
   { id: "d6", maskedPhone: "010-***-*082", gender: "남성", status: "상담대기", createdAt: "2026-09-02T02:04:00.000Z" },
-  { id: "d7", maskedPhone: "010-***-*714", gender: "여성", status: "접수완료", createdAt: "2026-09-02T01:47:00.000Z" },
+  { id: "d7", maskedPhone: "010-***-*714", gender: "여성", status: "상담중", createdAt: "2026-09-02T01:47:00.000Z" },
   { id: "d8", maskedPhone: "010-***-*359", gender: "남성", status: "상담완료", createdAt: "2026-09-02T01:22:00.000Z" },
   { id: "d9", maskedPhone: "010-***-*460", gender: "여성", status: "접수완료", createdAt: "2026-09-02T00:58:00.000Z" },
   { id: "d10", maskedPhone: "010-***-*927", gender: "남성", status: "상담대기", createdAt: "2026-09-02T00:33:00.000Z" },
-  { id: "d11", maskedPhone: "010-***-*204", gender: "여성", status: "접수완료", createdAt: "2026-09-01T23:51:00.000Z" },
+  { id: "d11", maskedPhone: "010-***-*204", gender: "여성", status: "상담중", createdAt: "2026-09-01T23:51:00.000Z" },
   { id: "d12", maskedPhone: "010-***-*586", gender: "남성", status: "상담완료", createdAt: "2026-09-01T23:16:00.000Z" },
   { id: "d13", maskedPhone: "010-***-*835", gender: "여성", status: "접수완료", createdAt: "2026-09-01T22:40:00.000Z" },
   { id: "d14", maskedPhone: "010-***-*172", gender: "남성", status: "상담대기", createdAt: "2026-09-01T22:09:00.000Z" },
-  { id: "d15", maskedPhone: "010-***-*948", gender: "여성", status: "접수완료", createdAt: "2026-09-01T21:37:00.000Z" },
+  { id: "d15", maskedPhone: "010-***-*948", gender: "여성", status: "상담중", createdAt: "2026-09-01T21:37:00.000Z" },
   { id: "d16", maskedPhone: "010-***-*516", gender: "남성", status: "상담완료", createdAt: "2026-09-01T21:02:00.000Z" },
   { id: "d17", maskedPhone: "010-***-*701", gender: "여성", status: "접수완료", createdAt: "2026-09-01T20:28:00.000Z" },
   { id: "d18", maskedPhone: "010-***-*143", gender: "남성", status: "상담대기", createdAt: "2026-09-01T19:55:00.000Z" },
-  { id: "d19", maskedPhone: "010-***-*629", gender: "여성", status: "접수완료", createdAt: "2026-09-01T19:21:00.000Z" },
+  { id: "d19", maskedPhone: "010-***-*629", gender: "여성", status: "상담중", createdAt: "2026-09-01T19:21:00.000Z" },
   { id: "d20", maskedPhone: "010-***-*067", gender: "남성", status: "상담완료", createdAt: "2026-09-01T18:44:00.000Z" },
 ];
 
@@ -42,6 +42,22 @@ function byLatest(list: StatusItem[]) {
       ...item,
       maskedPhone: displayMaskedPhone(item.maskedPhone),
     }));
+}
+
+function withConsultingVisible(list: StatusItem[]) {
+  if (list.slice(0, 5).some((item) => item.status === "상담중")) return list;
+  const later = list.findIndex((item) => item.status === "상담중");
+  if (later >= 0) {
+    const next = [...list];
+    const [item] = next.splice(later, 1);
+    next.splice(Math.min(2, next.length), 0, item);
+    return next;
+  }
+  if (!list.length) return list;
+  const next = [...list];
+  const idx = Math.min(2, next.length - 1);
+  next[idx] = { ...next[idx], status: "상담중" };
+  return next;
 }
 
 function displayMaskedPhone(phone: string) {
@@ -60,7 +76,7 @@ function StatusRows({ items }: { items: StatusItem[] }) {
         <li key={item.id}>
           <span className="status-phone">{item.maskedPhone}</span>
           <span className="status-meta">{item.gender}</span>
-          <span className="status-badge">{item.status}</span>
+          <span className="status-badge" data-status={item.status}>{item.status}</span>
         </li>
       ))}
     </ul>
@@ -68,7 +84,7 @@ function StatusRows({ items }: { items: StatusItem[] }) {
 }
 
 export default function HomeHero() {
-  const [items, setItems] = useState<StatusItem[]>(() => byLatest(DEMO_STATUS));
+  const [items, setItems] = useState<StatusItem[]>(() => withConsultingVisible(byLatest(DEMO_STATUS)));
   const [payOpen, setPayOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
 
@@ -80,9 +96,9 @@ export default function HomeHero() {
           .then((data: { items?: StatusItem[] }) => data.items || []),
       )
       .then((next) => {
-        setItems(byLatest(next.length ? next : DEMO_STATUS));
+        setItems(withConsultingVisible(byLatest(next.length ? next : DEMO_STATUS)));
       })
-      .catch(() => setItems(byLatest(DEMO_STATUS)));
+      .catch(() => setItems(withConsultingVisible(byLatest(DEMO_STATUS))));
   }, []);
 
   useEffect(() => {
@@ -121,9 +137,11 @@ export default function HomeHero() {
 
         <div className="hero-col">
           <article className="inquiry-card" id="inquiry">
-            <h2 className="compare-title">기본상담 / 심화상담</h2>
+            <h2 className="compare-title">기본상담 | 심화상담</h2>
             <p className="compare-foot">
-              I RE:CARE는 기존 설계사 중심 상담이 아닌 고객 이익을 최우선으로 하며 가입권유는 하지 않습니다
+              I RE:CARE는 기존 설계사 중심 상담이 아닌
+              <br />
+              고객 이익을 최우선으로 하며 가입권유는 하지 않습니다
             </p>
             <div className="compare-box">
               <div className="compare-col free">
@@ -144,9 +162,27 @@ export default function HomeHero() {
                 </ul>
               </div>
             </div>
+            <div className="consult-flow">
+              <p>상담 진행 순서</p>
+              <ol>
+                <li>
+                  <span>1</span>
+                  상담 신청
+                </li>
+                <li>
+                  <span>2</span>
+                  보장 분석
+                </li>
+                <li>
+                  <span>3</span>
+                  상담 후 PDF 안내
+                </li>
+              </ol>
+            </div>
             <button type="button" className="inquiry-btn" onClick={() => setPayOpen(true)}>
               내 보험 확인하기 →
             </button>
+            <p className="inquiry-foot">상담 후 정리 내용은 PDF 파일로 제공되며, 가입 권유는 하지 않습니다</p>
           </article>
         </div>
         </div>

@@ -19,22 +19,31 @@
 }
 
 :root {
-  --green: #0b3d2e;
-  --green-soft: #164a3a;
-  --green-pale: #eef4f1;
-  --navy: #0b3d2e;
-  --navy-soft: #164a3a;
-  --gold: #0b3d2e;
-  --gold-deep: #082e22;
-  --cream: #eef4f1;
+  --green: #fc4e00;
+  --green-soft: #e04400;
+  --green-pale: #fff1ea;
+  --navy: #fc4e00;
+  --navy-soft: #e04400;
+  --gold: #fc4e00;
+  --gold-deep: #b52f00;
+  --cream: #fff1ea;
   --paper: #ffffff;
   --ink: #111111;
   --muted: #66706c;
   --line: #e4e8e6;
   --danger: #c0352b;
-  --ok: #0b3d2e;
+  --ok: #fc4e00;
   --page: #f3f5f4;
-  --shadow: 0 10px 32px rgba(11, 61, 46, 0.07);
+  --accent-rgb: 252, 78, 0;
+  --status-done: #ffd4b8;
+  --status-done-ink: #c43c00;
+  --status-wait: #ff9a5c;
+  --status-wait-ink: #8a2e00;
+  --status-ing: #fc4e00;
+  --status-ing-ink: #fff;
+  --status-end: #b52f00;
+  --status-end-ink: #fff;
+  --shadow: 0 10px 32px rgba(var(--accent-rgb), 0.1);
   --radius: 18px;
   --font: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --display: "NanumSquareRound", "Pretendard", "Apple SD Gothic Neo", sans-serif;
@@ -158,7 +167,7 @@ body:not(:has(.home-shell)) .topbar {
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
-  text-shadow: 0 2px 8px rgba(11, 61, 46, 0.22);
+  text-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.22);
 }
 
 .brand-sub {
@@ -559,7 +568,7 @@ body:not(:has(.home-shell)) .topbar {
 
 .status-board h2,
 .inquiry-card h2 {
-  font-size: 24px;
+  font-size: 27px;
   font-weight: 800;
   letter-spacing: -0.04em;
   margin-bottom: 8px;
@@ -645,9 +654,29 @@ body:not(:has(.home-shell)) .topbar {
   font-size: 12px;
   font-weight: 700;
   color: #fff;
-  background: var(--green);
+  background: var(--status-ing);
   border-radius: 999px;
   padding: 5px 10px;
+}
+
+.status-badge[data-status="접수완료"] {
+  background: var(--status-done);
+  color: var(--status-done-ink);
+}
+
+.status-badge[data-status="상담대기"] {
+  background: var(--status-wait);
+  color: var(--status-wait-ink);
+}
+
+.status-badge[data-status="상담중"] {
+  background: var(--status-ing);
+  color: var(--status-ing-ink);
+}
+
+.status-badge[data-status="상담완료"] {
+  background: var(--status-end);
+  color: var(--status-end-ink);
 }
 
 .status-empty {
@@ -709,11 +738,72 @@ body:not(:has(.home-shell)) .topbar {
   justify-content: flex-start;
 }
 
+.consult-flow {
+  margin-top: 14px;
+  padding: 12px 12px 14px;
+  background: #f7f8f7;
+  border: 1px solid #edf0ee;
+  border-radius: 14px;
+}
+
+.consult-flow p {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+.consult-flow ol {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.consult-flow li {
+  list-style: none;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.consult-flow li span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.inquiry-btn {
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.inquiry-foot {
+  margin-top: auto;
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+  background: #f3f5f4;
+  border-radius: 12px;
+}
+
 .inquiry-card .compare-title {
-  font-size: clamp(20px, 2.2vw, 26px);
+  font-size: clamp(24px, 2.4vw, 28px);
   letter-spacing: -0.04em;
   text-align: center;
-  margin: 0 0 18px;
+  margin: 0 0 8px;
   color: var(--ink);
 }
 
@@ -730,24 +820,21 @@ body:not(:has(.home-shell)) .topbar {
   gap: 12px;
   background: transparent;
   min-height: 0;
-  flex: 1;
+  flex: 0 0 auto;
+  align-items: stretch;
   text-align: center;
 }
 
 .compare-col {
   position: relative;
-  padding: 22px 16px 18px;
+  padding: 14px 14px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 14px;
   background: #f7f8f7;
   border: 1.5px solid #e4e8e6;
-}
-
-.compare-col.paid {
-  background: #f7f8f7;
-  border: 1.5px solid var(--green);
+  height: auto;
 }
 
 .compare-col h3 {
@@ -757,7 +844,7 @@ body:not(:has(.home-shell)) .topbar {
   letter-spacing: -0.04em;
   text-align: center;
   color: #44514c;
-  margin: 0 0 14px;
+  margin: 0 0 8px;
   padding: 0;
   background: none;
   width: 100%;
@@ -774,7 +861,7 @@ body:not(:has(.home-shell)) .topbar {
 
 .compare-col ul {
   display: grid;
-  gap: 10px;
+  gap: 6px;
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
@@ -811,10 +898,12 @@ body:not(:has(.home-shell)) .topbar {
 
 .compare-foot {
   text-align: center;
-  margin: 18px 0 16px;
+  margin: 0 0 12px;
   font-size: 14px;
-  line-height: 1.75;
-  color: #44514c;
+  font-weight: 800;
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: -0.03em;
 }
 
 .compare-foot em {
@@ -854,7 +943,7 @@ body:not(:has(.home-shell)) .topbar {
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: rgba(11, 61, 46, 0.45);
+  background: rgba(7, 17, 31, 0.5);
   display: grid;
   place-items: center;
   padding: 20px;
@@ -961,7 +1050,7 @@ body:not(:has(.home-shell)) .topbar {
 .plan.on {
   border-color: var(--green);
   background: var(--green-pale);
-  box-shadow: 0 0 0 3px rgba(11, 61, 46, 0.12);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
 }
 
 .pay-modal {
@@ -1216,7 +1305,7 @@ select {
 
 input:focus,
 select:focus {
-  outline: 2px solid rgba(11, 61, 46, 0.18);
+  outline: 2px solid rgba(var(--accent-rgb), 0.18);
   border-color: var(--green);
 }
 
@@ -1373,7 +1462,7 @@ button[type="submit"]:disabled {
   position: absolute;
   left: 12px;
   bottom: 12px;
-  background: rgba(11, 61, 46, 0.86);
+  background: rgba(var(--accent-rgb), 0.86);
   color: #fff;
   font-size: 12px;
   font-weight: 800;
@@ -1998,6 +2087,10 @@ button[type="submit"]:disabled {
   }
 }
 
+.pay-form textarea {
+  min-height: 88px;
+}
+
 textarea {
   width: 100%;
   min-height: 180px;
@@ -2012,7 +2105,7 @@ textarea {
 }
 
 textarea:focus {
-  outline: 2px solid rgba(11, 61, 46, 0.18);
+  outline: 2px solid rgba(var(--accent-rgb), 0.18);
   border-color: var(--green);
 }
 

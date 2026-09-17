@@ -13,11 +13,11 @@ type Row = {
   id: string;
   phone: string;
   gender: "남성" | "여성";
-  status: "접수완료" | "상담대기" | "상담완료";
+  status: "접수완료" | "상담대기" | "상담중" | "상담완료";
   createdAt: string;
 };
 
-const STATUSES: Row["status"][] = ["접수완료", "상담대기", "상담완료"];
+const STATUSES: Row["status"][] = ["접수완료", "상담대기", "상담중", "상담완료"];
 
 function toLocalInput(iso: string) {
   const date = new Date(iso);

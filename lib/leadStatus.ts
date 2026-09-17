@@ -16,7 +16,7 @@ const GITHUB_REPO = "archon3338-wq/insurance-homepage";
 const GITHUB_BRANCH = "main";
 const GITHUB_FILE = "data/lead-status.json";
 
-export const LEAD_STATUSES = ["접수완료", "상담대기", "상담완료"] as const;
+export const LEAD_STATUSES = ["접수완료", "상담대기", "상담중", "상담완료"] as const;
 export type LeadStatusLabel = (typeof LEAD_STATUSES)[number];
 
 function isLeadStatus(value: string): value is LeadStatusLabel {

@@ -52,9 +52,10 @@
 
           <div class="hero-col">
             <article class="inquiry-card" id="inquiry">
-              <h2 class="compare-title">기본상담 / 심화상담</h2>
+              <h2 class="compare-title">기본상담 | 심화상담</h2>
               <p class="compare-foot">
-                I RE:CARE는 기존 설계사 중심 상담이 아닌 고객 이익을 최우선으로 하며 가입권유는 하지 않습니다
+                I RE:CARE는 기존 설계사 중심 상담이 아닌<br />
+                고객 이익을 최우선으로 하며 가입권유는 하지 않습니다
               </p>
               <div class="compare-box">
                 <div class="compare-col free">
@@ -75,7 +76,16 @@
                   </ul>
                 </div>
               </div>
+              <div class="consult-flow">
+                <p>상담 진행 순서</p>
+                <ol>
+                  <li><span>1</span>상담 신청</li>
+                  <li><span>2</span>보장 분석</li>
+                  <li><span>3</span>상담 후 PDF 안내</li>
+                </ol>
+              </div>
               <button type="button" class="inquiry-btn" id="openPay">내 보험 확인하기 →</button>
+              <p class="inquiry-foot">상담 후 정리 내용은 PDF 파일로 제공되며, 가입 권유는 하지 않습니다</p>
             </article>
           </div>
         </div>
@@ -187,6 +197,16 @@
               <label for="pay-phone">핸드폰번호</label>
               <input id="pay-phone" type="tel" placeholder="010-1234-5678" required />
             </div>
+            <div id="premiumFields" hidden>
+              <div class="field">
+                <label for="pay-job">직업</label>
+                <input id="pay-job" type="text" placeholder="예: 회사원, 자영업" />
+              </div>
+              <div class="field">
+                <label for="pay-note">기타(문의사항)</label>
+                <textarea id="pay-note" rows="3" placeholder="궁금한 점을 적어 주세요"></textarea>
+              </div>
+            </div>
             <label class="consent">
               <input type="checkbox" id="pay-consent" />
               <span>
@@ -205,6 +225,8 @@
             <dl class="pg-summary">
               <div><dt>신청자</dt><dd id="pgName"></dd></div>
               <div><dt>상담</dt><dd id="pgProduct"></dd></div>
+              <div id="pgJobRow" hidden><dt>직업</dt><dd id="pgJob"></dd></div>
+              <div id="pgNoteRow" hidden><dt>기타(문의사항)</dt><dd id="pgNote"></dd></div>
             </dl>
             <button type="button" class="pay-btn" id="cardPay">신청 완료</button>
             <p class="msg ok" id="payDoneMsg" hidden>신청이 전달되었습니다. 상담사가 확인 후 연락드립니다.</p>
@@ -377,29 +399,48 @@
       var demo = [
         { phone: "010-***-*821", gender: "여성", status: "접수완료", time: "9. 2. 13:10" },
         { phone: "010-***-*193", gender: "남성", status: "상담대기", time: "9. 2. 12:42" },
-        { phone: "010-***-*750", gender: "여성", status: "접수완료", time: "9. 2. 12:18" },
+        { phone: "010-***-*750", gender: "여성", status: "상담중", time: "9. 2. 12:18" },
         { phone: "010-***-*608", gender: "남성", status: "상담완료", time: "9. 2. 11:55" },
         { phone: "010-***-*341", gender: "여성", status: "접수완료", time: "9. 2. 11:31" },
         { phone: "010-***-*082", gender: "남성", status: "상담대기", time: "9. 2. 11:04" },
-        { phone: "010-***-*714", gender: "여성", status: "접수완료", time: "9. 2. 10:47" },
+        { phone: "010-***-*714", gender: "여성", status: "상담중", time: "9. 2. 10:47" },
         { phone: "010-***-*359", gender: "남성", status: "상담완료", time: "9. 2. 10:22" },
         { phone: "010-***-*460", gender: "여성", status: "접수완료", time: "9. 2. 09:58" },
         { phone: "010-***-*927", gender: "남성", status: "상담대기", time: "9. 2. 09:33" },
-        { phone: "010-***-*204", gender: "여성", status: "접수완료", time: "9. 2. 08:51" },
+        { phone: "010-***-*204", gender: "여성", status: "상담중", time: "9. 2. 08:51" },
         { phone: "010-***-*586", gender: "남성", status: "상담완료", time: "9. 2. 08:16" },
         { phone: "010-***-*835", gender: "여성", status: "접수완료", time: "9. 1. 22:40" },
         { phone: "010-***-*172", gender: "남성", status: "상담대기", time: "9. 1. 22:09" },
-        { phone: "010-***-*948", gender: "여성", status: "접수완료", time: "9. 1. 21:37" },
+        { phone: "010-***-*948", gender: "여성", status: "상담중", time: "9. 1. 21:37" },
         { phone: "010-***-*516", gender: "남성", status: "상담완료", time: "9. 1. 21:02" },
         { phone: "010-***-*701", gender: "여성", status: "접수완료", time: "9. 1. 20:28" },
         { phone: "010-***-*143", gender: "남성", status: "상담대기", time: "9. 1. 19:55" },
-        { phone: "010-***-*629", gender: "여성", status: "접수완료", time: "9. 1. 19:21" },
+        { phone: "010-***-*629", gender: "여성", status: "상담중", time: "9. 1. 19:21" },
         { phone: "010-***-*067", gender: "남성", status: "상담완료", time: "9. 1. 18:44" }
       ];
 
       function statusItemHtml(item) {
-        return '<li><span class="status-phone">' + item.phone + '</span><span class="status-meta">' +
-          item.gender + '</span><span class="status-badge">' + item.status + "</span></li>";
+        return '<li><span class="status-phone">' + (item.phone || item.maskedPhone) + '</span><span class="status-meta">' +
+          item.gender + '</span><span class="status-badge" data-status="' + item.status + '">' + item.status + "</span></li>";
+      }
+
+      function withConsultingVisible(rows) {
+        var list = (rows || []).slice();
+        if (!list.length) return demo;
+        var inView = list.slice(0, 5).some(function (item) { return item.status === "상담중"; });
+        if (inView) return list;
+        var later = -1;
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].status === "상담중") { later = i; break; }
+        }
+        if (later >= 0) {
+          var moved = list.splice(later, 1)[0];
+          list.splice(Math.min(2, list.length), 0, moved);
+          return list;
+        }
+        var idx = Math.min(2, list.length - 1);
+        list[idx] = Object.assign({}, list[idx], { status: "상담중" });
+        return list;
       }
 
       function loadSavedStatus() {
@@ -414,7 +455,7 @@
       }
 
       function renderStatus(list) {
-        var rows = list && list.length ? list : loadSavedStatus();
+        var rows = withConsultingVisible(list && list.length ? list : loadSavedStatus());
         document.getElementById("statusList").innerHTML = rows.slice(0, 5).map(statusItemHtml).join("");
         document.getElementById("statusDetailList").innerHTML = rows.map(statusItemHtml).join("");
       }
@@ -467,6 +508,8 @@
         setPlan(next);
         document.getElementById("formTitle").textContent = planLabel() + " 신청 정보";
         document.getElementById("formSub").textContent = planLabel() + " 진행을 위해 아래 정보를 입력해 주세요.";
+        document.getElementById("premiumFields").hidden = next !== "premium";
+        document.getElementById("pay-job").required = next === "premium";
         document.getElementById("goPay").textContent = "상담 신청하기";
         document.getElementById("payFormMsg").hidden = true;
         document.getElementById("cardPay").hidden = false;
@@ -523,6 +566,8 @@
         var birth = document.getElementById("pay-birth").value;
         var gender = document.getElementById("pay-gender").value;
         var phone = document.getElementById("pay-phone").value.replace(/\D/g, "");
+        var job = document.getElementById("pay-job").value.trim();
+        var note = document.getElementById("pay-note").value.trim();
         var consent = document.getElementById("pay-consent").checked;
         var msg = document.getElementById("payFormMsg");
         function fail(text) {
@@ -533,12 +578,17 @@
         if (!isAdult(birth)) return fail("만 19세 이상의 생년월일을 입력해 주세요.");
         if (!gender) return fail("성별을 선택해 주세요.");
         if (phone.length < 10) return fail("핸드폰번호를 올바르게 입력해 주세요.");
+        if (plan === "premium" && job.length < 1) return fail("직업을 입력해 주세요.");
         if (!consent) {
           policyModal.hidden = false;
           return fail("개인정보 제3자 제공에 동의해 주세요.");
         }
         document.getElementById("pgName").textContent = name;
         document.getElementById("pgProduct").textContent = planLabel();
+        document.getElementById("pgJob").textContent = job;
+        document.getElementById("pgNote").textContent = note;
+        document.getElementById("pgJobRow").hidden = plan !== "premium";
+        document.getElementById("pgNoteRow").hidden = plan !== "premium" || !note;
         document.getElementById("cardPay").textContent = "신청 완료";
         document.getElementById("cardPay").hidden = false;
         document.getElementById("payDoneMsg").hidden = true;
