@@ -96,7 +96,7 @@ export default function PayFlow({ onClose }: PayFlowProps) {
   const [consent, setConsent] = useState(false);
   const [policyOpen, setPolicyOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [payDone, setPayDone] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   function openAmount(next: Plan) {
     setPlan(next);
@@ -117,7 +117,7 @@ export default function PayFlow({ onClose }: PayFlowProps) {
     setPolicyOpen(false);
   }
 
-  function onSubmitForm(event: FormEvent<HTMLFormElement>) {
+  async function onSubmitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
 
@@ -147,7 +147,33 @@ export default function PayFlow({ onClose }: PayFlowProps) {
       return;
     }
 
-    setStep("pay");
+    setSubmitting(true);
+    try {
+      const response = await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          phone,
+          birthDate,
+          gender,
+          plan,
+          job,
+          note,
+          consent,
+        }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setMessage(data.error || "신청에 실패했습니다. 다시 시도해 주세요.");
+        return;
+      }
+      setStep("pay");
+    } catch {
+      setMessage("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -308,8 +334,8 @@ export default function PayFlow({ onClose }: PayFlowProps) {
               </span>
             </label>
 
-            <button type="submit" className="pay-btn">
-              상담 신청하기
+            <button type="submit" className="pay-btn" disabled={submitting}>
+              {submitting ? "보내는 중..." : "상담 신청하기"}
             </button>
             {message ? <p className="msg err">{message}</p> : null}
           </form>
@@ -344,13 +370,7 @@ export default function PayFlow({ onClose }: PayFlowProps) {
                 </>
               ) : null}
             </dl>
-            {payDone ? (
-              <p className="msg ok">신청이 전달되었습니다. 상담사가 확인 후 연락드립니다.</p>
-            ) : (
-              <button type="button" className="pay-btn" onClick={() => setPayDone(true)}>
-                신청 완료
-              </button>
-            )}
+            <p className="msg ok">신청이 전달되었습니다. 상담사가 확인 후 연락드립니다.</p>
           </div>
         ) : null}
       </div>

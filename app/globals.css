@@ -1631,11 +1631,12 @@ button[type="submit"]:disabled {
 }
 
 .legal-copy p {
-  margin: 0 0 14px;
+  margin: 0;
 }
 
-.legal-copy p:last-child {
-  margin-bottom: 0;
+.legal-copy strong {
+  font-weight: 800;
+  color: #4d5551;
 }
 
 .legal-warn {
