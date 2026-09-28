@@ -109,14 +109,14 @@
       "id": "demo-17",
       "maskedPhone": "010-***-*701",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담완료",
       "createdAt": "2026-09-01T20:28:00.000Z"
     },
     {
       "id": "demo-18",
       "maskedPhone": "010-***-*143",
       "gender": "남성",
-      "status": "상담대기",
+      "status": "상담완료",
       "createdAt": "2026-09-01T19:55:00.000Z"
     },
     {
