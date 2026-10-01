@@ -90,13 +90,6 @@
       "gender": "여성",
       "status": "상담완료",
       "createdAt": "2026-09-02T01:47:00.000Z"
-    },
-    {
-      "id": "demo-8",
-      "maskedPhone": "010-***-*359",
-      "gender": "남성",
-      "status": "상담완료",
-      "createdAt": "2026-09-02T01:22:00.000Z"
     }
   ]
 }
