@@ -11,14 +11,14 @@
       "id": "1790578878119-06s0",
       "maskedPhone": "010-***-*331",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담대기",
       "createdAt": "2026-09-28T07:01:18.119Z"
     },
     {
       "id": "demo-2",
       "maskedPhone": "010-***-*193",
       "gender": "남성",
-      "status": "접수완료",
+      "status": "상담대기",
       "createdAt": "2026-09-02T03:42:00.000Z"
     },
     {
