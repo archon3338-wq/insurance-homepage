@@ -96,7 +96,7 @@ export default function HomeHero() {
           .then((data: { items?: StatusItem[] }) => data.items || []),
       )
       .then((next) => {
-        setItems(withConsultingVisible(byLatest(next.length ? next : DEMO_STATUS)));
+        setItems(next.length ? byLatest(next) : withConsultingVisible(byLatest(DEMO_STATUS)));
       })
       .catch(() => setItems(withConsultingVisible(byLatest(DEMO_STATUS))));
   }, []);
@@ -147,9 +147,9 @@ export default function HomeHero() {
               <div className="compare-col free">
                 <h3>기본상담</h3>
                 <ul>
-                  <li>내 보장분석만 정확히 알기</li>
-                  <li>내 보험 보상이 어떻게 나올지 파악</li>
-                  <li>분석 내용 PDF 파일 제공</li>
+                  <li>내 보장분석 정확히 알기</li>
+                  <li>내 보험 한번에 파악하기</li>
+                  <li>내 보험 보상 확인</li>
                 </ul>
               </div>
               <div className="compare-col paid">
@@ -158,7 +158,7 @@ export default function HomeHero() {
                   <li>기본상담+심층분석</li>
                   <li>철저한 고객중심</li>
                   <li>정확한 재무상태에 따른 분석</li>
-                  <li>리모델링이 필요하신 분</li>
+                  <li>재무상태에 따른 리모델링 의견</li>
                 </ul>
               </div>
             </div>
@@ -175,14 +175,18 @@ export default function HomeHero() {
                 </li>
                 <li>
                   <span>3</span>
-                  상담 후 PDF 안내
+                  고객중심 상담
                 </li>
               </ol>
             </div>
             <button type="button" className="inquiry-btn" onClick={() => setPayOpen(true)}>
               내 보험 확인하기 →
             </button>
-            <p className="inquiry-foot">상담 후 정리 내용은 PDF 파일로 제공되며, 가입 권유는 하지 않습니다</p>
+            <p className="inquiry-foot">
+              아이리케어는 가입을 위한 설계사 중심의 판단-상담은 하지 않습니다
+              <br />
+              더 나은 오늘을 만들어 가는 고객 편에서 분석을 하고 상담해 드리며, 가입 권유는 하지 않습니다
+            </p>
           </article>
         </div>
         </div>
@@ -208,7 +212,15 @@ export default function HomeHero() {
         </div>
       ) : null}
 
-      {payOpen ? <PayFlow onClose={() => setPayOpen(false)} /> : null}
+      {payOpen ? (
+        <PayFlow
+          onClose={() => setPayOpen(false)}
+          onSubmitted={(item) => {
+            setItems((prev) => byLatest([item, ...prev.filter((row) => row.id !== item.id)]));
+            window.setTimeout(() => loadStatus(), 1200);
+          }}
+        />
+      ) : null}
     </section>
   );
 }

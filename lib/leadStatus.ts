@@ -240,7 +240,11 @@ export async function addLeadStatus(phone: string, genderLabel: string) {
   };
   store.items.unshift(item);
   store.items = store.items.slice(0, 50);
-  await writeStore(store);
+  try {
+    await writeStore(store);
+  } catch {
+    // 접수현황 저장이 실패해도 신청 자체는 완료로 처리합니다.
+  }
   return item;
 }
 

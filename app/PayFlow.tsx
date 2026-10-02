@@ -1,25 +1,23 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { isAdultBirth, normalizeBirthDate } from "@/lib/birthDate";
 
 type Plan = "basic" | "premium";
 type Step = "plan" | "form" | "pay";
 
-type PayFlowProps = {
-  onClose: () => void;
+type SubmittedLead = {
+  id: string;
+  maskedPhone: string;
+  gender: string;
+  status: string;
+  createdAt: string;
 };
 
-function isAdult(birthDate: string) {
-  const birth = new Date(`${birthDate}T00:00:00`);
-  if (Number.isNaN(birth.getTime())) return false;
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age -= 1;
-  }
-  return age >= 19;
-}
+type PayFlowProps = {
+  onClose: () => void;
+  onSubmitted?: (item: SubmittedLead) => void;
+};
 
 function planLabel(plan: Plan) {
   return plan === "basic" ? "기본상담" : "심화상담";
@@ -84,7 +82,7 @@ export function PrivacyNotice() {
   );
 }
 
-export default function PayFlow({ onClose }: PayFlowProps) {
+export default function PayFlow({ onClose, onSubmitted }: PayFlowProps) {
   const [step, setStep] = useState<Step>("plan");
   const [plan, setPlan] = useState<Plan>("basic");
   const [name, setName] = useState("");
@@ -125,8 +123,9 @@ export default function PayFlow({ onClose }: PayFlowProps) {
       setMessage("성함을 입력해 주세요.");
       return;
     }
-    if (!isAdult(birthDate)) {
-      setMessage("만 19세 이상의 생년월일을 입력해 주세요.");
+    const birthIso = normalizeBirthDate(birthDate);
+    if (!isAdultBirth(birthIso)) {
+      setMessage("생년월일을 000000처럼 6자리로 입력해 주세요. 만 19세 이상만 신청할 수 있습니다.");
       return;
     }
     if (!gender) {
@@ -155,7 +154,7 @@ export default function PayFlow({ onClose }: PayFlowProps) {
         body: JSON.stringify({
           name: name.trim(),
           phone,
-          birthDate,
+          birthDate: birthIso,
           gender,
           plan,
           job,
@@ -163,11 +162,12 @@ export default function PayFlow({ onClose }: PayFlowProps) {
           consent,
         }),
       });
-      const data = (await response.json()) as { error?: string };
+      const data = (await response.json()) as { error?: string; item?: SubmittedLead };
       if (!response.ok) {
         setMessage(data.error || "신청에 실패했습니다. 다시 시도해 주세요.");
         return;
       }
+      if (data.item) onSubmitted?.(data.item);
       setStep("pay");
     } catch {
       setMessage("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
@@ -202,9 +202,9 @@ export default function PayFlow({ onClose }: PayFlowProps) {
                 />
                 <strong>기본상담</strong>
                 <ul className="plan-points">
-                  <li>내 보험 알기</li>
-                  <li>내 보상 알기</li>
-                  <li>PDF 파일 제공</li>
+                  <li>내 보장분석 정확히 알기</li>
+                  <li>내 보험 한번에 파악하기</li>
+                  <li>내 보험 파악</li>
                 </ul>
               </label>
               <label className={`plan ${plan === "premium" ? "on" : ""}`}>
@@ -258,9 +258,12 @@ export default function PayFlow({ onClose }: PayFlowProps) {
               <label htmlFor="pay-birth">생년월일</label>
               <input
                 id="pay-birth"
-                type="date"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="000000"
                 value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
+                onChange={(e) => setBirthDate(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 required
               />
             </div>

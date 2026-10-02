@@ -1,3 +1,4 @@
+import { isAdultBirth, normalizeBirthDate } from "@/lib/birthDate";
 import { jsonNoStore, optionsNoStore } from "@/lib/cors";
 import { Resend } from "resend";
 import { addLeadStatus } from "@/lib/leadStatus";
@@ -23,19 +24,6 @@ function normalizePhone(value: string) {
   return value.trim();
 }
 
-function isAdult(birthDate: string) {
-  const birth = new Date(`${birthDate}T00:00:00`);
-  if (Number.isNaN(birth.getTime())) return false;
-
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age -= 1;
-  }
-  return age >= 19;
-}
-
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {
@@ -51,7 +39,7 @@ export async function POST(request: Request) {
 
     const name = (body.name || "").trim();
     const phone = normalizePhone(body.phone || "");
-    const birthDate = (body.birthDate || "").trim();
+    const birthDate = normalizeBirthDate(body.birthDate || "");
     const gender = body.gender === "male" || body.gender === "female" ? body.gender : "";
     const plan = body.plan === "premium" ? "premium" : "basic";
     const job = (body.job || "").trim();
@@ -67,8 +55,8 @@ export async function POST(request: Request) {
       return jsonNoStore({ error: "휴대폰 번호를 올바르게 입력해 주세요." }, 400);
     }
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate) || !isAdult(birthDate)) {
-      return jsonNoStore({ error: "만 19세 이상의 생년월일을 입력해 주세요." }, 400);
+    if (!birthDate || !isAdultBirth(birthDate)) {
+      return jsonNoStore({ error: "생년월일을 000000처럼 6자리로 입력해 주세요. 만 19세 이상만 신청할 수 있습니다." }, 400);
     }
 
     if (!gender) {
@@ -114,13 +102,22 @@ export async function POST(request: Request) {
       return jsonNoStore({ error: "이메일 발송에 실패했습니다. 설정을 확인해 주세요." }, 500);
     }
 
+    let item = {
+      id: `${Date.now()}`,
+      maskedPhone: phone.replace(/\D/g, "").length >= 6
+        ? `${phone.replace(/\D/g, "").slice(0, 3)}-***-*${phone.replace(/\D/g, "").slice(-3)}`
+        : "010-***-****",
+      gender: genderLabel,
+      status: "접수완료",
+      createdAt: new Date().toISOString(),
+    };
     try {
-      await addLeadStatus(phone, genderLabel);
+      item = await addLeadStatus(phone, genderLabel);
     } catch {
       // 메일 발송은 되었으므로 현황 저장 실패는 신청을 막지 않습니다.
     }
 
-    return jsonNoStore({ ok: true });
+    return jsonNoStore({ ok: true, item });
   } catch {
     return jsonNoStore({ error: "잠시 후 다시 시도해 주세요." }, 500);
   }

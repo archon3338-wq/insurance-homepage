@@ -61,9 +61,9 @@
                 <div class="compare-col free">
                   <h3>기본상담</h3>
                   <ul>
-                    <li>내 보장분석만 정확히 알기</li>
-                    <li>내 보험 보상이 어떻게 나올지 파악</li>
-                    <li>분석 내용 PDF 파일 제공</li>
+                    <li>내 보장분석 정확히 알기</li>
+                    <li>내 보험 한번에 파악하기</li>
+                    <li>내 보험 보상 확인</li>
                   </ul>
                 </div>
                 <div class="compare-col paid">
@@ -72,7 +72,7 @@
                     <li>기본상담+심층분석</li>
                     <li>철저한 고객중심</li>
                     <li>정확한 재무상태에 따른 분석</li>
-                    <li>리모델링이 필요하신 분</li>
+                    <li>재무상태에 따른 리모델링 의견</li>
                   </ul>
                 </div>
               </div>
@@ -81,11 +81,14 @@
                 <ol>
                   <li><span>1</span>상담 신청</li>
                   <li><span>2</span>보장 분석</li>
-                  <li><span>3</span>상담 후 PDF 안내</li>
+                  <li><span>3</span>고객중심 상담</li>
                 </ol>
               </div>
               <button type="button" class="inquiry-btn" id="openPay">내 보험 확인하기 →</button>
-              <p class="inquiry-foot">상담 후 정리 내용은 PDF 파일로 제공되며, 가입 권유는 하지 않습니다</p>
+              <p class="inquiry-foot">
+                아이리케어는 가입을 위한 설계사 중심의 판단-상담은 하지 않습니다<br />
+                더 나은 오늘을 만들어 가는 고객 편에서 분석을 하고 상담해 드리며, 가입 권유는 하지 않습니다
+              </p>
             </article>
           </div>
         </div>
@@ -151,9 +154,9 @@
                 <input type="radio" name="plan" value="basic" checked />
                 <strong>기본상담</strong>
                 <ul class="plan-points">
-                  <li>내 보험 알기</li>
-                  <li>내 보상 알기</li>
-                  <li>PDF 파일 제공</li>
+                  <li>내 보장분석 정확히 알기</li>
+                  <li>내 보험 한번에 파악하기</li>
+                  <li>내 보험 파악</li>
                 </ul>
               </label>
               <label class="plan" id="planPremium">
@@ -183,7 +186,7 @@
             </div>
             <div class="field">
               <label for="pay-birth">생년월일</label>
-              <input id="pay-birth" type="date" required />
+              <input id="pay-birth" type="text" inputmode="numeric" maxlength="6" placeholder="000000" required />
             </div>
             <div class="field">
               <label for="pay-gender">성별</label>
@@ -459,9 +462,22 @@
       }
 
       function renderStatus(list) {
-        var rows = withConsultingVisible(list && list.length ? list : loadSavedStatus());
+        var rows = list && list.length ? list : loadSavedStatus();
         document.getElementById("statusList").innerHTML = rows.slice(0, 5).map(statusItemHtml).join("");
         document.getElementById("statusDetailList").innerHTML = rows.map(statusItemHtml).join("");
+      }
+
+      function prependStatus(item) {
+        var row = {
+          phone: item.maskedPhone || item.phone,
+          gender: item.gender || "",
+          status: item.status || "접수완료"
+        };
+        var list = document.getElementById("statusList");
+        var detail = document.getElementById("statusDetailList");
+        list.insertAdjacentHTML("afterbegin", statusItemHtml(row));
+        while (list.children.length > 5) list.removeChild(list.lastChild);
+        detail.insertAdjacentHTML("afterbegin", statusItemHtml(row));
       }
 
       function renderStatusFromLive(data) {
@@ -520,8 +536,32 @@
         document.getElementById("payDoneMsg").hidden = true;
         showPayStep("form");
       }
+      function normalizeBirthDate(value) {
+        var digits = String(value || "").replace(/\D/g, "");
+        if (digits.length !== 6) return "";
+        var yy = Number(digits.slice(0, 2));
+        var mm = digits.slice(2, 4);
+        var dd = digits.slice(4, 6);
+        function toDate(year) {
+          var iso = year + "-" + mm + "-" + dd;
+          var date = new Date(iso + "T00:00:00");
+          if (isNaN(date.getTime())) return null;
+          if (date.getMonth() + 1 !== Number(mm) || date.getDate() !== Number(dd)) return null;
+          return date;
+        }
+        var today = new Date();
+        var as20 = toDate(2000 + yy);
+        if (as20 && as20 <= today && today.getFullYear() - as20.getFullYear() < 100) {
+          return 2000 + yy + "-" + mm + "-" + dd;
+        }
+        var as19 = toDate(1900 + yy);
+        if (as19 && as19 <= today) return 1900 + yy + "-" + mm + "-" + dd;
+        return "";
+      }
       function isAdult(birthDate) {
-        var birth = new Date(birthDate + "T00:00:00");
+        var iso = normalizeBirthDate(birthDate);
+        if (!iso) return false;
+        var birth = new Date(iso + "T00:00:00");
         if (isNaN(birth.getTime())) return false;
         var today = new Date();
         var age = today.getFullYear() - birth.getFullYear();
@@ -564,10 +604,13 @@
         document.getElementById("pay-consent").checked = true;
         policyModal.hidden = true;
       });
+      document.getElementById("pay-birth").addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 6);
+      });
       document.getElementById("payStepForm").addEventListener("submit", function (e) {
         e.preventDefault();
         var name = document.getElementById("pay-name").value.trim();
-        var birth = document.getElementById("pay-birth").value;
+        var birth = normalizeBirthDate(document.getElementById("pay-birth").value);
         var gender = document.getElementById("pay-gender").value;
         var phone = document.getElementById("pay-phone").value.replace(/\D/g, "");
         var job = document.getElementById("pay-job").value.trim();
@@ -579,7 +622,9 @@
           msg.hidden = false;
         }
         if (name.length < 2) return fail("성함을 입력해 주세요.");
-        if (!isAdult(birth)) return fail("만 19세 이상의 생년월일을 입력해 주세요.");
+        if (!birth || !isAdult(document.getElementById("pay-birth").value)) {
+          return fail("생년월일을 000000처럼 6자리로 입력해 주세요. 만 19세 이상만 신청할 수 있습니다.");
+        }
         if (!gender) return fail("성별을 선택해 주세요.");
         if (phone.length < 10) return fail("핸드폰번호를 올바르게 입력해 주세요.");
         if (plan === "premium" && job.length < 1) return fail("직업을 입력해 주세요.");
@@ -618,6 +663,11 @@
             document.getElementById("cardPay").hidden = true;
             document.getElementById("payDoneMsg").hidden = false;
             showPayStep("pay");
+            prependStatus(result.data.item || {
+              phone: "010-***-*" + phone.slice(-3),
+              gender: gender === "male" ? "남성" : "여성",
+              status: "접수완료"
+            });
           })
           .catch(function () {
             goPay.disabled = false;
