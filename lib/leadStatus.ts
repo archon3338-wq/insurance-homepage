@@ -153,6 +153,24 @@ async function writeToGitHub(store: Store, token = githubToken()) {
   };
 
   let res = await fetch(api, { method: "PUT", headers, body, cache: "no-store" });
+  if (res.status === 409) {
+    const latest = await fetch(`${api}?ref=${GITHUB_BRANCH}`, {
+      headers: githubHeaders(writeToken),
+      cache: "no-store",
+    });
+    const latestJson = latest.ok ? ((await latest.json()) as { sha?: string }) : {};
+    res = await fetch(api, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({
+        message: "update lead status",
+        content,
+        sha: latestJson.sha,
+        branch: GITHUB_BRANCH,
+      }),
+      cache: "no-store",
+    });
+  }
   if (res.status === 401 || res.status === 404) {
     res = await fetch(api, {
       method: "PUT",
@@ -230,7 +248,6 @@ export async function listLeadStatus() {
 }
 
 export async function addLeadStatus(phone: string, genderLabel: string) {
-  const store = await readStore();
   const item: LeadStatusItem = {
     id: `${Date.now()}`,
     maskedPhone: maskPhone(phone),
@@ -238,12 +255,16 @@ export async function addLeadStatus(phone: string, genderLabel: string) {
     status: "접수완료",
     createdAt: new Date().toISOString(),
   };
-  store.items.unshift(item);
-  store.items = store.items.slice(0, 50);
-  try {
-    await writeStore(store);
-  } catch {
-    // 접수현황 저장이 실패해도 신청 자체는 완료로 처리합니다.
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const store = await readStore();
+    store.items = [item, ...store.items.filter((row) => row.id !== item.id)].slice(0, 50);
+    try {
+      await writeStore(store);
+      return item;
+    } catch {
+      if (attempt === 2) return item;
+    }
   }
   return item;
 }

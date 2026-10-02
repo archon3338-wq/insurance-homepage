@@ -66,6 +66,34 @@ function displayMaskedPhone(phone: string) {
   return `${digits.slice(0, 3)}-***-*${digits.slice(-3)}`;
 }
 
+const EXTRA_STATUS_KEY = "irecare-new-leads";
+
+function readExtraStatus(): StatusItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(EXTRA_STATUS_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeExtraStatus(items: StatusItem[]) {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem(EXTRA_STATUS_KEY, JSON.stringify(items.slice(0, 20)));
+}
+
+function rememberStatus(item: StatusItem) {
+  writeExtraStatus([item, ...readExtraStatus().filter((row) => row.id !== item.id)]);
+}
+
+function mergeStatus(remote: StatusItem[]) {
+  const remoteIds = new Set(remote.map((item) => item.id));
+  const pending = readExtraStatus().filter((item) => !remoteIds.has(item.id));
+  writeExtraStatus(pending);
+  return byLatest([...pending, ...remote]);
+}
+
 function StatusRows({ items }: { items: StatusItem[] }) {
   if (items.length === 0) {
     return <p className="status-empty">아직 접수된 상담이 없습니다.</p>;
@@ -96,7 +124,12 @@ export default function HomeHero() {
           .then((data: { items?: StatusItem[] }) => data.items || []),
       )
       .then((next) => {
-        setItems(next.length ? byLatest(next) : withConsultingVisible(byLatest(DEMO_STATUS)));
+        if (next.length) {
+          setItems(mergeStatus(next));
+          return;
+        }
+        const extras = readExtraStatus();
+        setItems(extras.length ? byLatest(extras) : withConsultingVisible(byLatest(DEMO_STATUS)));
       })
       .catch(() => setItems(withConsultingVisible(byLatest(DEMO_STATUS))));
   }, []);
@@ -216,8 +249,8 @@ export default function HomeHero() {
         <PayFlow
           onClose={() => setPayOpen(false)}
           onSubmitted={(item) => {
+            rememberStatus(item);
             setItems((prev) => byLatest([item, ...prev.filter((row) => row.id !== item.id)]));
-            window.setTimeout(() => loadStatus(), 1200);
           }}
         />
       ) : null}

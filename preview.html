@@ -450,6 +450,35 @@
         return list;
       }
 
+      var EXTRA_KEY = "irecare-new-leads";
+      function readExtras() {
+        try {
+          var parsed = JSON.parse(sessionStorage.getItem(EXTRA_KEY) || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+      function rememberExtra(item) {
+        var row = {
+          phone: item.maskedPhone || item.phone,
+          gender: item.gender || "",
+          status: item.status || "접수완료",
+          id: item.id || String(Date.now())
+        };
+        var next = [row].concat(readExtras().filter(function (it) { return it.id !== row.id; })).slice(0, 20);
+        sessionStorage.setItem(EXTRA_KEY, JSON.stringify(next));
+        return row;
+      }
+      function mergeExtras(rows) {
+        var extras = readExtras();
+        if (!extras.length) return rows;
+        var seen = {};
+        rows.forEach(function (item) { seen[(item.phone || "") + (item.status || "")] = true; });
+        var pending = extras.filter(function (item) { return !seen[(item.phone || "") + (item.status || "")]; });
+        return pending.concat(rows);
+      }
+
       function loadSavedStatus() {
         try {
           var raw = localStorage.getItem("irecare-lead-status");
@@ -461,23 +490,17 @@
         return demo;
       }
 
+      var lastRows = [];
       function renderStatus(list) {
-        var rows = list && list.length ? list : loadSavedStatus();
+        if (list && list.length) lastRows = list;
+        var rows = mergeExtras(lastRows.length ? lastRows : loadSavedStatus());
         document.getElementById("statusList").innerHTML = rows.slice(0, 5).map(statusItemHtml).join("");
         document.getElementById("statusDetailList").innerHTML = rows.map(statusItemHtml).join("");
       }
 
       function prependStatus(item) {
-        var row = {
-          phone: item.maskedPhone || item.phone,
-          gender: item.gender || "",
-          status: item.status || "접수완료"
-        };
-        var list = document.getElementById("statusList");
-        var detail = document.getElementById("statusDetailList");
-        list.insertAdjacentHTML("afterbegin", statusItemHtml(row));
-        while (list.children.length > 5) list.removeChild(list.lastChild);
-        detail.insertAdjacentHTML("afterbegin", statusItemHtml(row));
+        rememberExtra(item);
+        renderStatus(null);
       }
 
       function renderStatusFromLive(data) {
