@@ -92,13 +92,34 @@ export default function AdminStatusPage() {
   const readyRef = useRef(false);
 
   const fetchRemote = useCallback(async () => {
-    const fromGitHub = await loadLeadStatusFromGitHub().catch(() => []);
-    const source = fromGitHub.length
-      ? fromGitHub
-      : await fetch("/api/lead-status", { cache: "no-store" })
-          .then((res) => res.json())
-          .then((data: { items?: Array<{ id: string; maskedPhone: string; gender: string; status: string; createdAt: string }> }) => data.items || []);
-    return sortNewest(source.map(toRow));
+    const extraRaw = (() => {
+      try {
+        const parsed = JSON.parse(sessionStorage.getItem("irecare-new-leads") || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    })();
+    const [fromApi, fromGitHub] = await Promise.all([
+      fetch("/api/lead-status", { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data: { items?: Array<{ id: string; maskedPhone: string; gender: string; status: string; createdAt: string }> }) => data.items || [])
+        .catch(() => []),
+      loadLeadStatusFromGitHub(readStoredToken() || undefined).catch(() => []),
+    ]);
+    const map = new Map<string, Row>();
+    [...extraRaw, ...fromApi, ...fromGitHub].forEach((item) => {
+      const row = toRow(item as {
+        id: string;
+        maskedPhone?: string;
+        phone?: string;
+        gender: string;
+        status: string;
+        createdAt: string;
+      });
+      if (row.id && !map.has(row.id)) map.set(row.id, row);
+    });
+    return sortNewest([...map.values()]);
   }, []);
 
   const loadItems = useCallback(async () => {
@@ -114,12 +135,22 @@ export default function AdminStatusPage() {
       const have = new Set(prev.map((item) => item.id));
       const incoming = remote.filter((item) => !have.has(item.id));
       if (!incoming.length) return prev;
+      queueMicrotask(() => setDirty(true));
       return sortNewest([...incoming, ...prev]);
     });
   }, [fetchRemote]);
 
   useEffect(() => {
-    setToken(readStoredToken());
+    const stored = readStoredToken();
+    setToken(stored);
+    if (stored) {
+      void fetch("/api/admin/lead-status", {
+        method: "POST",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ githubToken: stored }),
+      }).catch(() => {});
+    }
     loadItems().catch(() => {
       setOk(false);
       setMessage("접수현황을 불러오지 못했습니다.");
@@ -218,6 +249,7 @@ export default function AdminStatusPage() {
           <p className="eyebrow">ADMIN</p>
           <h1>접수현황 관리</h1>
           <p className="intro">
+            홈에서 상담 신청이 들어오면 이 목록 맨 위에 자동으로 올라갑니다.
             여기서 저장하면 홈 접수현황은 컴퓨터·휴대폰 어디서든 같이 바뀝니다.
             토큰은 이 관리 화면에서 수정할 때만 필요합니다. 다른 컴퓨터에서 수정할 때도
             같은 토큰을 한 번 붙여넣으면 됩니다.

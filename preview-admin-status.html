@@ -71,6 +71,7 @@
       var KEY = "irecare-lead-status";
       var TOKEN_KEY = "irecare-github-token";
       var GITHUB_FILE = "https://api.github.com/repos/archon3338-wq/insurance-homepage/contents/data/lead-status.json";
+      var LIVE_API = "https://www.irecare.com/api/lead-status";
       var LIVE_PUT = "https://www.irecare.com/api/admin/lead-status";
       var fallback = [
         { id: "demo-1", phone: "010-***-*821", gender: "여성", status: "접수완료", createdAt: "2026-09-02T13:10" },
@@ -213,17 +214,52 @@
       try {
         document.getElementById("githubToken").value = localStorage.getItem(TOKEN_KEY) || "";
       } catch (e) {}
-      fetch(GITHUB_FILE + "?ref=main&t=" + Date.now(), {
-        cache: "no-store",
-        headers: { Accept: "application/vnd.github+json", "User-Agent": "irecare-lead-status" }
-      })
-        .then(function (res) { return res.json(); })
-        .then(function (file) {
-          if (!file || !file.content) return;
-          var parsed = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, "")))));
-          if (parsed && Array.isArray(parsed.items) && parsed.items.length) {
-            applyRemote(parsed.items, true);
-          }
+      (function registerToken() {
+        var token = (document.getElementById("githubToken").value || "").trim();
+        if (!token) return;
+        fetch(LIVE_PUT, {
+          method: "POST",
+          cache: "no-store",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ githubToken: token })
+        }).catch(function () {});
+      })();
+      function githubHeaders() {
+        var headers = { Accept: "application/vnd.github+json", "User-Agent": "irecare-lead-status" };
+        var token = (document.getElementById("githubToken").value || "").trim();
+        if (token) headers.Authorization = "Bearer " + token;
+        return headers;
+      }
+
+      function fetchGithubItems() {
+        return fetch(GITHUB_FILE + "?ref=main&t=" + Date.now(), {
+          cache: "no-store",
+          headers: githubHeaders()
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (file) {
+            if (!file || !file.content) return [];
+            var parsed = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, "")))));
+            return parsed && Array.isArray(parsed.items) ? parsed.items : [];
+          })
+          .catch(function () { return []; });
+      }
+
+      function fetchApiItems() {
+        return fetch(LIVE_API, { cache: "no-store" })
+          .then(function (res) { return res.json(); })
+          .then(function (data) { return data && Array.isArray(data.items) ? data.items : []; })
+          .catch(function () { return []; });
+      }
+
+      Promise.all([fetchApiItems(), fetchGithubItems()])
+        .then(function (results) {
+          var map = {};
+          results[0].concat(results[1]).forEach(function (item) {
+            if (item && item.id && !map[item.id]) map[item.id] = item;
+          });
+          var merged = Object.keys(map).map(function (id) { return map[id]; });
+          if (merged.length) applyRemote(merged, true);
         })
         .catch(function () { render(); });
 
@@ -253,17 +289,14 @@
       }
 
       function pullRemote() {
-        fetch(GITHUB_FILE + "?ref=main&t=" + Date.now(), {
-          cache: "no-store",
-          headers: { Accept: "application/vnd.github+json", "User-Agent": "irecare-lead-status" }
-        })
-          .then(function (res) { return res.json(); })
-          .then(function (file) {
-            if (!file || !file.content) return;
-            var parsed = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, "")))));
-            if (parsed && Array.isArray(parsed.items) && parsed.items.length) applyRemote(parsed.items);
-          })
-          .catch(function () {});
+        Promise.all([fetchApiItems(), fetchGithubItems()]).then(function (results) {
+          var map = {};
+          results[0].concat(results[1]).forEach(function (item) {
+            if (item && item.id && !map[item.id]) map[item.id] = item;
+          });
+          var merged = Object.keys(map).map(function (id) { return map[id]; });
+          if (merged.length) applyRemote(merged);
+        }).catch(function () {});
       }
 
       setInterval(pullRemote, 4000);

@@ -117,13 +117,19 @@ export default function HomeHero() {
   const [detailOpen, setDetailOpen] = useState(false);
 
   const loadStatus = useCallback(() => {
-    loadLeadStatusFromGitHub()
-      .catch(() =>
-        fetch("/api/lead-status", { cache: "no-store" })
-          .then((res) => res.json())
-          .then((data: { items?: StatusItem[] }) => data.items || []),
-      )
-      .then((next) => {
+    Promise.all([
+      fetch("/api/lead-status", { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data: { items?: StatusItem[] }) => data.items || [])
+        .catch(() => []),
+      loadLeadStatusFromGitHub().catch(() => []),
+    ])
+      .then(([fromApi, fromGitHub]) => {
+        const map = new Map<string, StatusItem>();
+        [...fromApi, ...fromGitHub].forEach((item) => {
+          if (item?.id && !map.has(item.id)) map.set(item.id, item);
+        });
+        const next = [...map.values()];
         if (next.length) {
           setItems(mergeStatus(next));
           return;

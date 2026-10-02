@@ -1,5 +1,13 @@
 import { promises as fs } from "fs";
+import os from "os";
 import path from "path";
+import {
+  cacheGithubToken,
+  decryptWriteToken,
+  encryptWriteToken,
+  loadCachedGithubToken,
+  readCachedGithubToken,
+} from "./githubTokenCache";
 
 export type LeadStatusItem = {
   id: string;
@@ -9,12 +17,15 @@ export type LeadStatusItem = {
   createdAt: string;
 };
 
-type Store = { items: LeadStatusItem[] };
+type Store = { items: LeadStatusItem[]; writeKey?: string };
 
 const dataPath = path.join(process.cwd(), "data", "lead-status.json");
+const tmpPath = path.join(os.tmpdir(), "irecare-lead-status.json");
 const GITHUB_REPO = "archon3338-wq/insurance-homepage";
 const GITHUB_BRANCH = "main";
 const GITHUB_FILE = "data/lead-status.json";
+
+let memoryStore: Store = { items: [] };
 
 export const LEAD_STATUSES = ["접수완료", "상담대기", "상담중", "상담완료"] as const;
 export type LeadStatusLabel = (typeof LEAD_STATUSES)[number];
@@ -30,18 +41,37 @@ export function maskPhone(phone: string) {
 }
 
 function githubToken() {
-  return process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "";
+  return process.env.GITHUB_TOKEN || process.env.GH_TOKEN || readCachedGithubToken();
 }
 
 function remoteStoreUrl() {
   return (process.env.LEAD_STATUS_STORE_URL || "").trim();
 }
 
+function mergeStores(...stores: Store[]) {
+  const map = new Map<string, LeadStatusItem>();
+  let writeKey = "";
+  for (const store of stores) {
+    if (!writeKey && store.writeKey) writeKey = store.writeKey;
+    for (const item of store.items) {
+      if (item?.id && !map.has(item.id)) map.set(item.id, item);
+    }
+  }
+  return {
+    items: [...map.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    ...(writeKey ? { writeKey } : {}),
+  };
+}
+
 function parseStore(data: unknown): Store | null {
   if (!data || typeof data !== "object") return null;
   const items = (data as { items?: unknown }).items;
   if (!Array.isArray(items)) return null;
-  return { items: items as LeadStatusItem[] };
+  const writeKey = (data as { writeKey?: unknown }).writeKey;
+  return {
+    items: items as LeadStatusItem[],
+    ...(typeof writeKey === "string" && writeKey ? { writeKey } : {}),
+  };
 }
 
 function githubHeaders(token?: string): HeadersInit {
@@ -203,16 +233,58 @@ async function writeLocalStore(store: Store) {
   await fs.writeFile(dataPath, JSON.stringify(store, null, 2), "utf8");
 }
 
+async function readTmpStore(): Promise<Store> {
+  try {
+    const raw = await fs.readFile(tmpPath, "utf8");
+    return parseStore(JSON.parse(raw)) || { items: [] };
+  } catch {
+    return { items: [] };
+  }
+}
+
+async function writeTmpStore(store: Store) {
+  memoryStore = {
+    items: store.items.slice(0, 50),
+    ...(store.writeKey ? { writeKey: store.writeKey } : {}),
+  };
+  try {
+    await fs.writeFile(tmpPath, JSON.stringify(memoryStore, null, 2), "utf8");
+  } catch {
+    // /tmp 가 없어도 메모리에는 남겨 같은 서버에서 바로 보이게 합니다.
+  }
+}
+
 async function readStore(): Promise<Store> {
-  const remote = await readRemoteStore();
-  if (remote) return remote;
-  const github = await readFromGitHub();
-  if (github) return github;
-  return readLocalStore();
+  const [remote, github, tmp, local] = await Promise.all([
+    readRemoteStore(),
+    readFromGitHub(),
+    readTmpStore(),
+    readLocalStore(),
+  ]);
+  return mergeStores(
+    remote || { items: [] },
+    github || { items: [] },
+    local,
+    tmp,
+    memoryStore,
+  );
+}
+
+async function resolveWriteToken(store: Store, token?: string) {
+  const direct = normalizeGithubToken(token || githubToken() || (await loadCachedGithubToken()));
+  if (direct) return direct;
+  if (!store.writeKey) return "";
+  try {
+    const unlocked = decryptWriteToken(store.writeKey);
+    if (unlocked) await cacheGithubToken(unlocked);
+    return normalizeGithubToken(unlocked);
+  } catch {
+    return "";
+  }
 }
 
 async function writeStore(store: Store, token?: string) {
-  const writeToken = normalizeGithubToken(token || githubToken());
+  const writeToken = await resolveWriteToken(store, token);
   const remoteOk = await writeRemoteStore(store).catch(() => false);
   if (writeToken) {
     await writeToGitHub(store, writeToken);
@@ -259,8 +331,9 @@ export async function addLeadStatus(phone: string, genderLabel: string) {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const store = await readStore();
     store.items = [item, ...store.items.filter((row) => row.id !== item.id)].slice(0, 50);
+    await writeTmpStore(store);
     try {
-      await writeStore(store);
+      await writeStore(store, await resolveWriteToken(store));
       return item;
     } catch {
       if (attempt === 2) return item;
@@ -296,7 +369,25 @@ export async function replaceLeadStatus(
     };
   });
 
-  const store = { items: next.sort((a, b) => b.createdAt.localeCompare(a.createdAt)) };
-  await writeStore(store, token);
+  const prev = await readStore();
+  const writeToken = normalizeGithubToken(token || "");
+  if (writeToken) await cacheGithubToken(writeToken);
+  const store: Store = {
+    items: next.sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    writeKey: writeToken ? encryptWriteToken(writeToken) : prev.writeKey,
+  };
+  await writeTmpStore(store);
+  await writeStore(store, writeToken || undefined);
   return store.items;
+}
+
+export async function rememberGithubWriteToken(token: string) {
+  const writeToken = normalizeGithubToken(token);
+  if (!writeToken) throw new Error("토큰이 없습니다.");
+  await cacheGithubToken(writeToken);
+  const store = await readStore();
+  store.writeKey = encryptWriteToken(writeToken);
+  await writeTmpStore(store);
+  await writeStore(store, writeToken);
+  return true;
 }

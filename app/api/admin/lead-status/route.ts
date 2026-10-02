@@ -1,5 +1,5 @@
 import { jsonNoStore, optionsNoStore } from "@/lib/cors";
-import { listLeadStatus, replaceLeadStatus } from "@/lib/leadStatus";
+import { listLeadStatus, rememberGithubWriteToken, replaceLeadStatus } from "@/lib/leadStatus";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,6 +12,17 @@ export function OPTIONS() {
 export async function GET() {
   const items = await listLeadStatus();
   return jsonNoStore({ items });
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as { githubToken?: string };
+    await rememberGithubWriteToken(body.githubToken || "");
+    return jsonNoStore({ ok: true });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "토큰을 저장하지 못했습니다.";
+    return jsonNoStore({ error: message }, 400);
+  }
 }
 
 export async function PUT(request: Request) {

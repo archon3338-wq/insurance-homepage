@@ -31,10 +31,10 @@ export function base64ToUtf8(value: string) {
   return new TextDecoder().decode(bytes);
 }
 
-export async function loadLeadStatusFromGitHub() {
+export async function loadLeadStatusFromGitHub(token?: string) {
   const res = await fetch(`${CONTENTS_URL}?ref=${LEAD_GITHUB_BRANCH}&t=${Date.now()}`, {
     cache: "no-store",
-    headers: githubHeaders(),
+    headers: githubHeaders(token),
   });
   if (!res.ok) throw new Error("접수현황을 불러오지 못했습니다.");
   const data = (await res.json()) as { content?: string };
