@@ -6,7 +6,6 @@ import SiteHeader from "../../SiteHeader";
 import {
   LEAD_GITHUB_TOKEN_KEY,
   LEAD_GITHUB_TOKEN_URL,
-  loadLeadStatusFromGitHub,
 } from "@/lib/githubLead";
 
 type Row = {
@@ -100,15 +99,12 @@ export default function AdminStatusPage() {
         return [];
       }
     })();
-    const [fromApi, fromGitHub] = await Promise.all([
-      fetch("/api/lead-status", { cache: "no-store" })
-        .then((res) => res.json())
-        .then((data: { items?: Array<{ id: string; maskedPhone: string; gender: string; status: string; createdAt: string }> }) => data.items || [])
-        .catch(() => []),
-      loadLeadStatusFromGitHub(readStoredToken() || undefined).catch(() => []),
-    ]);
+    const fromApi = await fetch("/api/lead-status", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data: { items?: Array<{ id: string; maskedPhone: string; gender: string; status: string; createdAt: string }> }) => data.items || [])
+      .catch(() => []);
     const map = new Map<string, Row>();
-    [...extraRaw, ...fromApi, ...fromGitHub].forEach((item) => {
+    [...extraRaw, ...fromApi].forEach((item) => {
       const row = toRow(item as {
         id: string;
         maskedPhone?: string;
@@ -160,7 +156,7 @@ export default function AdminStatusPage() {
   useEffect(() => {
     const timer = window.setInterval(() => {
       void mergeIncoming();
-    }, 4000);
+    }, 2000);
     return () => window.clearInterval(timer);
   }, [mergeIncoming]);
 

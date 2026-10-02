@@ -289,17 +289,12 @@
       }
 
       function pullRemote() {
-        Promise.all([fetchApiItems(), fetchGithubItems()]).then(function (results) {
-          var map = {};
-          results[0].concat(results[1]).forEach(function (item) {
-            if (item && item.id && !map[item.id]) map[item.id] = item;
-          });
-          var merged = Object.keys(map).map(function (id) { return map[id]; });
-          if (merged.length) applyRemote(merged);
+        fetchApiItems().then(function (remoteItems) {
+          if (remoteItems.length) applyRemote(remoteItems);
         }).catch(function () {});
       }
 
-      setInterval(pullRemote, 4000);
+      setInterval(pullRemote, 2000);
     </script>
   </body>
 </html>

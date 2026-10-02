@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import PayFlow from "./PayFlow";
-import { loadLeadStatusFromGitHub } from "@/lib/githubLead";
 
 type StatusItem = {
   id: string;
@@ -117,19 +116,10 @@ export default function HomeHero() {
   const [detailOpen, setDetailOpen] = useState(false);
 
   const loadStatus = useCallback(() => {
-    Promise.all([
-      fetch("/api/lead-status", { cache: "no-store" })
-        .then((res) => res.json())
-        .then((data: { items?: StatusItem[] }) => data.items || [])
-        .catch(() => []),
-      loadLeadStatusFromGitHub().catch(() => []),
-    ])
-      .then(([fromApi, fromGitHub]) => {
-        const map = new Map<string, StatusItem>();
-        [...fromApi, ...fromGitHub].forEach((item) => {
-          if (item?.id && !map.has(item.id)) map.set(item.id, item);
-        });
-        const next = [...map.values()];
+    fetch("/api/lead-status", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data: { items?: StatusItem[] }) => {
+        const next = data.items || [];
         if (next.length) {
           setItems(mergeStatus(next));
           return;
@@ -142,6 +132,8 @@ export default function HomeHero() {
 
   useEffect(() => {
     loadStatus();
+    const timer = window.setInterval(() => loadStatus(), 2000);
+    return () => window.clearInterval(timer);
   }, [loadStatus]);
 
   return (

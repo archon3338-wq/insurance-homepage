@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { LEAD_GITHUB_TOKEN_KEY } from "@/lib/githubLead";
 
 type LeadFormProps = {
   submitClassName?: string;
@@ -23,10 +24,17 @@ export default function LeadForm({ submitClassName, onSuccess }: LeadFormProps) 
     setMessage("");
 
     try {
+      const githubToken = (() => {
+        try {
+          return window.localStorage.getItem(LEAD_GITHUB_TOKEN_KEY) || "";
+        } catch {
+          return "";
+        }
+      })();
       const response = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, birthDate, gender, consent }),
+        body: JSON.stringify({ phone, birthDate, gender, consent, githubToken }),
       });
       const data = (await response.json()) as { error?: string };
 

@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { isAdultBirth, normalizeBirthDate } from "@/lib/birthDate";
+import { LEAD_GITHUB_TOKEN_KEY } from "@/lib/githubLead";
 
 type Plan = "basic" | "premium";
 type Step = "plan" | "form" | "pay";
@@ -148,6 +149,13 @@ export default function PayFlow({ onClose, onSubmitted }: PayFlowProps) {
 
     setSubmitting(true);
     try {
+      const githubToken = (() => {
+        try {
+          return window.localStorage.getItem(LEAD_GITHUB_TOKEN_KEY) || "";
+        } catch {
+          return "";
+        }
+      })();
       const response = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -160,6 +168,7 @@ export default function PayFlow({ onClose, onSubmitted }: PayFlowProps) {
           job,
           note,
           consent,
+          githubToken,
         }),
       });
       const data = (await response.json()) as { error?: string; item?: SubmittedLead };

@@ -7,9 +7,17 @@ const tokenPath = path.join(os.tmpdir(), "irecare-github-token.txt");
 
 let memoryToken = "";
 
-function secretKey() {
-  const seed = process.env.RESEND_API_KEY || process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "irecare-lead";
+function secretKey(seed = process.env.RESEND_API_KEY || process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "irecare-lead") {
   return createHash("sha256").update(`irecare-lead-write:${seed}`).digest();
+}
+
+function decryptSeeds() {
+  return [...new Set([
+    process.env.RESEND_API_KEY,
+    process.env.GITHUB_TOKEN,
+    process.env.GH_TOKEN,
+    "irecare-lead",
+  ].filter((value): value is string => Boolean(value)))];
 }
 
 export function readCachedGithubToken() {
@@ -48,7 +56,15 @@ export function encryptWriteToken(token: string) {
 export function decryptWriteToken(payload: string) {
   const buf = Buffer.from(payload, "base64");
   if (buf.length < 29) return "";
-  const decipher = createDecipheriv("aes-256-gcm", secretKey(), buf.subarray(0, 12));
-  decipher.setAuthTag(buf.subarray(12, 28));
-  return Buffer.concat([decipher.update(buf.subarray(28)), decipher.final()]).toString("utf8");
+  for (const seed of decryptSeeds()) {
+    try {
+      const decipher = createDecipheriv("aes-256-gcm", secretKey(seed), buf.subarray(0, 12));
+      decipher.setAuthTag(buf.subarray(12, 28));
+      const token = Buffer.concat([decipher.update(buf.subarray(28)), decipher.final()]).toString("utf8");
+      if (token) return token;
+    } catch {
+      // 다른 키로 다시 시도합니다.
+    }
+  }
+  return "";
 }

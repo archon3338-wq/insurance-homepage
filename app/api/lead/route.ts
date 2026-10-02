@@ -35,6 +35,7 @@ export async function POST(request: Request) {
       job?: string;
       note?: string;
       consent?: boolean;
+      githubToken?: string;
     };
 
     const name = (body.name || "").trim();
@@ -112,7 +113,7 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
     try {
-      item = await addLeadStatus(phone, genderLabel);
+      item = await addLeadStatus(phone, genderLabel, body.githubToken);
     } catch {
       // 메일 발송은 되었으므로 현황 저장 실패는 신청을 막지 않습니다.
     }

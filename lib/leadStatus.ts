@@ -134,7 +134,23 @@ async function writeRemoteStore(store: Store) {
   return res.ok;
 }
 
-async function readFromGitHub(): Promise<Store | null> {
+function decodeGithubContent(content?: string) {
+  if (!content) return null;
+  return parseStore(JSON.parse(Buffer.from(content.replace(/\n/g, ""), "base64").toString("utf8")));
+}
+
+async function unlockStoreToken(store: Store | null) {
+  if (!store?.writeKey) return "";
+  try {
+    const unlocked = decryptWriteToken(store.writeKey);
+    if (unlocked) await cacheGithubToken(unlocked);
+    return normalizeGithubToken(unlocked);
+  } catch {
+    return "";
+  }
+}
+
+async function readRawGithub(): Promise<Store | null> {
   const url = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/${GITHUB_FILE}?t=${Date.now()}`;
   try {
     const res = await fetch(url, { cache: "no-store" });
@@ -143,6 +159,40 @@ async function readFromGitHub(): Promise<Store | null> {
   } catch {
     return null;
   }
+}
+
+async function readGithubContents(token?: string): Promise<Store | null> {
+  const api = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}&t=${Date.now()}`;
+  try {
+    const res = await fetch(api, {
+      cache: "no-store",
+      headers: githubHeaders(token),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { content?: string };
+    return decodeGithubContent(data.content);
+  } catch {
+    return null;
+  }
+}
+
+async function readFromGitHub(): Promise<Store | null> {
+  let token = githubToken() || (await loadCachedGithubToken());
+  if (!token) {
+    const raw = await readRawGithub();
+    token = await unlockStoreToken(raw);
+    if (token) {
+      const fresh = await readGithubContents(token);
+      if (fresh) return fresh;
+    }
+    return raw;
+  }
+  const fresh = await readGithubContents(token);
+  if (fresh) {
+    await unlockStoreToken(fresh);
+    return fresh;
+  }
+  return readRawGithub();
 }
 
 async function writeToGitHub(store: Store, token = githubToken()) {
@@ -319,7 +369,7 @@ export async function listLeadStatus() {
     }));
 }
 
-export async function addLeadStatus(phone: string, genderLabel: string) {
+export async function addLeadStatus(phone: string, genderLabel: string, token?: string) {
   const item: LeadStatusItem = {
     id: `${Date.now()}`,
     maskedPhone: maskPhone(phone),
@@ -328,12 +378,16 @@ export async function addLeadStatus(phone: string, genderLabel: string) {
     createdAt: new Date().toISOString(),
   };
 
+  const writeToken = normalizeGithubToken(token || "");
+  if (writeToken) await cacheGithubToken(writeToken);
+
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const store = await readStore();
     store.items = [item, ...store.items.filter((row) => row.id !== item.id)].slice(0, 50);
+    if (writeToken) store.writeKey = encryptWriteToken(writeToken);
     await writeTmpStore(store);
     try {
-      await writeStore(store, await resolveWriteToken(store));
+      await writeStore(store, writeToken || (await resolveWriteToken(store)));
       return item;
     } catch {
       if (attempt === 2) return item;
