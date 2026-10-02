@@ -25,7 +25,7 @@
       "id": "1790898006050-7epv",
       "maskedPhone": "010-***-*728",
       "gender": "여성",
-      "status": "상담대기",
+      "status": "상담중",
       "createdAt": "2026-10-01T23:40:06.050Z"
     },
     {
@@ -92,5 +92,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "puukJTFpebzz8DQC9/Mjmkq0ZWEZrDLRkXkIqP2baymQrAqGyXqEqUzRCHQfjLo+KUoCFV8rKu3zmlKrXPhQwqTLw/U="
+  "writeKey": "RobR5KlH+lw4XZEyw1k00T9ihrxdYeno267ZJOuDTQ2Vc1SQOOLu+ZtkJnNY0FpwmmCECNVUREB22P2aZCjxixz8Hxo="
 }
