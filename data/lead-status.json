@@ -46,7 +46,7 @@
       "id": "1790814811072-a88r",
       "maskedPhone": "010-***-*993",
       "gender": "여성",
-      "status": "상담중",
+      "status": "상담완료",
       "createdAt": "2026-10-01T00:33:31.072Z"
     },
     {
@@ -92,5 +92,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "+0ZksXwTfwE3e3GlDLB3vdEWWPB72ZSmn6zrUU03B07STQXDyNEY/y+/gZZv+65Xp9rrfdeIGzisQcDUZDotjPXyeqc="
+  "writeKey": "puukJTFpebzz8DQC9/Mjmkq0ZWEZrDLRkXkIqP2baymQrAqGyXqEqUzRCHQfjLo+KUoCFV8rKu3zmlKrXPhQwqTLw/U="
 }
