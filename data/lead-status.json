@@ -39,7 +39,7 @@
       "id": "1790814841064-0ams",
       "maskedPhone": "010-***-*463",
       "gender": "여성",
-      "status": "상담중",
+      "status": "상담완료",
       "createdAt": "2026-10-01T00:34:01.064Z"
     },
     {
@@ -92,5 +92,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "V/8cFBQmCWxwgbBXUQX2P+OHtprbgljGDnGDWwBStvFmP7nH72dbN4pbavh2hv1McMqnUHo/N/2e4NiB9QL8KqIqrDE="
+  "writeKey": "lZyT8s33L+Ap5nxgoNMTuySnN708lVnBRZVKU0WcqUcgHkv7FVakoBZLthai+Jh/j9RVm36ZCqOeKOtQwxl7yu5385k="
 }
