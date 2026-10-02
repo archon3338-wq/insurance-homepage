@@ -48,6 +48,32 @@ function maskPhone(phone: string) {
   return `${digits.slice(0, 3)}-***-*${digits.slice(-3)}`;
 }
 
+function sortNewest(rows: Row[]) {
+  return [...rows].sort((a, b) => {
+    const time = b.createdAt.localeCompare(a.createdAt);
+    return time !== 0 ? time : b.id.localeCompare(a.id);
+  });
+}
+
+function toRow(item: {
+  id: string;
+  maskedPhone?: string;
+  phone?: string;
+  gender: string;
+  status: string;
+  createdAt: string;
+}): Row {
+  return {
+    id: item.id,
+    phone: item.maskedPhone || item.phone || "",
+    gender: item.gender === "남성" ? "남성" : "여성",
+    status: STATUSES.includes(item.status as Row["status"])
+      ? (item.status as Row["status"])
+      : "접수완료",
+    createdAt: item.createdAt,
+  };
+}
+
 function readStoredToken() {
   try {
     return window.localStorage.getItem(LEAD_GITHUB_TOKEN_KEY) || "";
@@ -65,28 +91,32 @@ export default function AdminStatusPage() {
   const [ok, setOk] = useState(true);
   const readyRef = useRef(false);
 
-  const loadItems = useCallback(async () => {
+  const fetchRemote = useCallback(async () => {
     const fromGitHub = await loadLeadStatusFromGitHub().catch(() => []);
     const source = fromGitHub.length
       ? fromGitHub
       : await fetch("/api/lead-status", { cache: "no-store" })
           .then((res) => res.json())
           .then((data: { items?: Array<{ id: string; maskedPhone: string; gender: string; status: string; createdAt: string }> }) => data.items || []);
+    return sortNewest(source.map(toRow));
+  }, []);
 
-    setItems(
-      source.map((item) => ({
-        id: item.id,
-        phone: item.maskedPhone,
-        gender: item.gender === "남성" ? "남성" : "여성",
-        status: STATUSES.includes(item.status as Row["status"])
-          ? (item.status as Row["status"])
-          : "접수완료",
-        createdAt: item.createdAt,
-      })),
-    );
+  const loadItems = useCallback(async () => {
+    setItems(await fetchRemote());
     setDirty(false);
     readyRef.current = true;
-  }, []);
+  }, [fetchRemote]);
+
+  const mergeIncoming = useCallback(async () => {
+    const remote = await fetchRemote().catch(() => []);
+    if (!remote.length) return;
+    setItems((prev) => {
+      const have = new Set(prev.map((item) => item.id));
+      const incoming = remote.filter((item) => !have.has(item.id));
+      if (!incoming.length) return prev;
+      return sortNewest([...incoming, ...prev]);
+    });
+  }, [fetchRemote]);
 
   useEffect(() => {
     setToken(readStoredToken());
@@ -96,9 +126,21 @@ export default function AdminStatusPage() {
     });
   }, [loadItems]);
 
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      void mergeIncoming();
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, [mergeIncoming]);
+
   const save = useCallback(async () => {
     setSaving(true);
-    const payload = items.map((item) => ({
+    const remote = await fetchRemote().catch(() => []);
+    const have = new Set(items.map((item) => item.id));
+    const incoming = remote.filter((item) => !have.has(item.id));
+    const merged = sortNewest([...incoming, ...items]);
+    if (incoming.length) setItems(merged);
+    const payload = merged.map((item) => ({
       id: item.id,
       maskedPhone: maskPhone(item.phone),
       gender: item.gender,
@@ -153,7 +195,7 @@ export default function AdminStatusPage() {
     } finally {
       setSaving(false);
     }
-  }, [items, token]);
+  }, [fetchRemote, items, token]);
 
   useEffect(() => {
     if (!readyRef.current || !dirty || !token.trim()) return;

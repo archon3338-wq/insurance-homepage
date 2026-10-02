@@ -162,7 +162,13 @@
           });
       }
 
-      var items = loadItems();
+      function sortNewest(list) {
+        return list.slice().sort(function (a, b) {
+          return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+        });
+      }
+
+      var items = sortNewest(loadItems());
 
       function render() {
         document.getElementById("statusBody").innerHTML = items.map(function (item) {
@@ -216,19 +222,51 @@
           if (!file || !file.content) return;
           var parsed = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, "")))));
           if (parsed && Array.isArray(parsed.items) && parsed.items.length) {
-            items = parsed.items.map(function (item) {
-              return {
-                id: item.id,
-                phone: item.maskedPhone || item.phone,
-                gender: item.gender,
-                status: item.status,
-                createdAt: toLocal(item.createdAt)
-              };
-            });
-            render();
+            applyRemote(parsed.items, true);
           }
         })
         .catch(function () { render(); });
+
+      var hydrated = false;
+      function applyRemote(remoteItems, replace) {
+        var mapped = remoteItems.map(function (item) {
+          return {
+            id: item.id,
+            phone: item.maskedPhone || item.phone,
+            gender: item.gender,
+            status: item.status,
+            createdAt: toLocal(item.createdAt)
+          };
+        });
+        if (replace || !hydrated) {
+          items = sortNewest(mapped);
+          hydrated = true;
+          render();
+          return;
+        }
+        var have = {};
+        items.forEach(function (item) { have[item.id] = true; });
+        var incoming = mapped.filter(function (item) { return !have[item.id]; });
+        if (!incoming.length) return;
+        items = sortNewest(incoming.concat(items));
+        render();
+      }
+
+      function pullRemote() {
+        fetch(GITHUB_FILE + "?ref=main&t=" + Date.now(), {
+          cache: "no-store",
+          headers: { Accept: "application/vnd.github+json", "User-Agent": "irecare-lead-status" }
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (file) {
+            if (!file || !file.content) return;
+            var parsed = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, "")))));
+            if (parsed && Array.isArray(parsed.items) && parsed.items.length) applyRemote(parsed.items);
+          })
+          .catch(function () {});
+      }
+
+      setInterval(pullRemote, 4000);
     </script>
   </body>
 </html>
