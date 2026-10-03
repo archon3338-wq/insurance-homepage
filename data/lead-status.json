@@ -25,7 +25,7 @@
       "id": "1790898035323-y9vs",
       "maskedPhone": "010-***-*464",
       "gender": "여성",
-      "status": "상담완료",
+      "status": "상담중",
       "createdAt": "2026-10-01T23:40:35.323Z"
     },
     {
@@ -99,5 +99,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "bJ9Ko8OjK+8+XroE9gAzoO5dgVvNR6xYQDfKBjWPgqZZdUgqsVYNsSrdTsio5pwNkI4jeN9PTTljVqzRmPIJbSX5s34="
+  "writeKey": "VVwa5dLfIN2PQGlSRfZWuGDMlm5j0xkPKRCj6sfCmvIwZpx6f0N7Du2WqVvscXoMki5nchjXC1AjZeQsbYUSK5nqa88="
 }
