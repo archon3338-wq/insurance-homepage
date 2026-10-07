@@ -32,7 +32,7 @@
       "id": "1790912740720",
       "maskedPhone": "010-***-*594",
       "gender": "여성",
-      "status": "상담대기",
+      "status": "상담중",
       "createdAt": "2026-10-02T03:45:40.720Z"
     },
     {
@@ -113,5 +113,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "XXlz8ti1cr/+Um3SEJxCCMwoThhUcqITZS5vL3xHRvokbf0FsZVmcFHdGeuxwOjFJdcg1MIV8Wj8L2BlYz4UOEFw/7s="
+  "writeKey": "M7QBvgMeXWE9NyhLwVenrTw+toZzIkU4jLLuDIlhKMO7qcoUq8CK9TJkI8aNahhvA0BnEDzlEOlo7353ojynHxVcQt8="
 }
