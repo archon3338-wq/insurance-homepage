@@ -53,7 +53,7 @@
       "id": "1790897972250-epmb",
       "maskedPhone": "010-***-*654",
       "gender": "여성",
-      "status": "상담대기",
+      "status": "상담완료",
       "createdAt": "2026-10-01T23:39:32.250Z"
     },
     {
@@ -113,5 +113,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "6Z3fXL0KF/AYTczddACp0nsl0ijcFWU4gk2hqcftEx4t0TT7DjFWrMT3oN174ku5WHu1KEhnDEsiKohNUIadaYguvZ4="
+  "writeKey": "YyTnIA/hd6pFR7cZ59bUvj59geDgjzzxB+dF5EwZls+WKkjyFBSREkmYebJyPkkL8CM2L+lrZOJCFJpy8I6fLZwSGM4="
 }
