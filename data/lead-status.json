@@ -39,14 +39,14 @@
       "id": "1790898035323-y9vs",
       "maskedPhone": "010-***-*464",
       "gender": "여성",
-      "status": "상담중",
+      "status": "상담완료",
       "createdAt": "2026-10-01T23:40:35.323Z"
     },
     {
       "id": "1790898006050-7epv",
       "maskedPhone": "010-***-*728",
       "gender": "여성",
-      "status": "상담중",
+      "status": "상담완료",
       "createdAt": "2026-10-01T23:40:06.050Z"
     },
     {
@@ -113,5 +113,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "YyTnIA/hd6pFR7cZ59bUvj59geDgjzzxB+dF5EwZls+WKkjyFBSREkmYebJyPkkL8CM2L+lrZOJCFJpy8I6fLZwSGM4="
+  "writeKey": "XXlz8ti1cr/+Um3SEJxCCMwoThhUcqITZS5vL3xHRvokbf0FsZVmcFHdGeuxwOjFJdcg1MIV8Wj8L2BlYz4UOEFw/7s="
 }
