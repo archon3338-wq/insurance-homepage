@@ -2,12 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import JoinForm from "./JoinForm";
+import { useEffect, useState } from "react";
+import PayFlow from "./PayFlow";
 
 export default function SiteHeader() {
-  const [joinOpen, setJoinOpen] = useState(false);
+  const [consultOpen, setConsultOpen] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (window.location.hash === "#consult" || window.location.hash === "#join") {
+      setConsultOpen(true);
+    }
+  }, []);
 
   return (
     <>
@@ -29,30 +35,14 @@ export default function SiteHeader() {
             <Link className={`menu-link${pathname.startsWith("/board") ? " on" : ""}`} href="/board">
               게시판
             </Link>
-            <button type="button" className="nav-btn" onClick={() => setJoinOpen(true)}>
-              입사문의
-            </button>
           </div>
+          <button type="button" className="nav-btn" onClick={() => setConsultOpen(true)}>
+            내 보험 확인
+          </button>
         </div>
       </header>
 
-      {joinOpen ? (
-        <div className="modal-back" onClick={() => setJoinOpen(false)}>
-          <div
-            className="modal join-modal"
-            role="dialog"
-            aria-labelledby="join-title"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button type="button" className="modal-close" onClick={() => setJoinOpen(false)}>
-              닫기
-            </button>
-            <h3 id="join-title">입사문의</h3>
-            <p className="modal-sub">아래 정보를 남겨 주시면 확인 후 연락드립니다.</p>
-            <JoinForm privacyHref="/privacy" />
-          </div>
-        </div>
-      ) : null}
+      {consultOpen ? <PayFlow onClose={() => setConsultOpen(false)} /> : null}
     </>
   );
 }
