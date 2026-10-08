@@ -11,7 +11,7 @@
       "id": "1791143741989",
       "maskedPhone": "010-***-*026",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담대기",
       "createdAt": "2026-10-04T19:55:41.989Z"
     },
     {
@@ -113,5 +113,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "tKpUDuTCOug/3JXFMh4NnwcizSud4OEG52ycLUzXBnQ506L2hyyN4GTG/jps1IJBGNIW2nWgFUE250W7mbFPkAsd1aY="
+  "writeKey": "hSzeKr0l+YnL1drFSPSWlRK6zZdS6455lJUQqcCY2v7qXhLvCjT8MY2U/+BY2nl3lnvhENyWzrvif8UofI1akbMXw/Q="
 }
