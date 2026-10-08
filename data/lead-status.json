@@ -4,7 +4,7 @@
       "id": "1791348483431",
       "maskedPhone": "010-***-*015",
       "gender": "남성",
-      "status": "접수완료",
+      "status": "상담대기",
       "createdAt": "2026-10-07T04:48:03.431Z"
     },
     {
@@ -113,5 +113,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "hSzeKr0l+YnL1drFSPSWlRK6zZdS6455lJUQqcCY2v7qXhLvCjT8MY2U/+BY2nl3lnvhENyWzrvif8UofI1akbMXw/Q="
+  "writeKey": "v/xKoPpp6r1hZk0Un1UIcjSbWRz1A4lo6t1mbkfn6Kc2NRGsfBJ13aanisxi63TdnlgnhOUTMz4kABgkWnt2hKgV+Gc="
 }
