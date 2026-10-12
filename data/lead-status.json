@@ -25,7 +25,7 @@
       "id": "1790914014738",
       "maskedPhone": "010-***-*934",
       "gender": "여성",
-      "status": "상담대기",
+      "status": "상담중",
       "createdAt": "2026-10-02T04:06:54.738Z"
     },
     {
@@ -113,5 +113,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "OFro7fBMe8dbIR7s8HUbBO7l6JjQEEx5mLjuL1HmXcLtcXv3oOcyF/8Vg1dfVEW0j9G3+0ZLEmp+YqzRJx3JZPmufw4="
+  "writeKey": "GO/MDuQf44CIrQZQRURG88jpigJmahSG9d5JJhr5UlV8agJNYIn8nkYuULww8qXIciNV5SdUM+rvjF/CMMXLchI3/zs="
 }
