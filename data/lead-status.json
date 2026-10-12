@@ -11,14 +11,14 @@
       "id": "1791143741989",
       "maskedPhone": "010-***-*026",
       "gender": "여성",
-      "status": "상담대기",
+      "status": "상담중",
       "createdAt": "2026-10-04T19:55:41.989Z"
     },
     {
       "id": "1790988622387",
       "maskedPhone": "010-***-*736",
       "gender": "여성",
-      "status": "상담중",
+      "status": "상담완료",
       "createdAt": "2026-10-03T00:50:22.387Z"
     },
     {
@@ -113,5 +113,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "GO/MDuQf44CIrQZQRURG88jpigJmahSG9d5JJhr5UlV8agJNYIn8nkYuULww8qXIciNV5SdUM+rvjF/CMMXLchI3/zs="
+  "writeKey": "tgjzwEGSlNLxBdhXVENy1RVbrH2VrVv7ysi57IzgxRGGq0noEkTd7mpsepnmT40dol2/ONHiWwa5ZtvGVveYuz29brU="
 }
