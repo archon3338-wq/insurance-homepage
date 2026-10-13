@@ -4,7 +4,7 @@
       "id": "1791885235627",
       "maskedPhone": "010-***-*275",
       "gender": "남성",
-      "status": "접수완료",
+      "status": "상담대기",
       "createdAt": "2026-10-13T09:53:55.627Z"
     },
     {
@@ -127,5 +127,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "nBeaR0/ef53ERiHZeuI9wVx7z1FOpNvPrwXg9Bt6ociCzAfi/5PfZeL25g/Ykxcjt2IvcOTAkSelM6jrv+TyS0msQBU="
+  "writeKey": "bXqSmlPXs3LJkIdpuFA2OqaDhlMhpOGYPc7OBJ004ptkQkDjWuFj+jj4wBb1Rr283j7UWFfZjrEDru8XnJnWqA8erL0="
 }
