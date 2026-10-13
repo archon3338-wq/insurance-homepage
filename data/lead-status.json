@@ -11,7 +11,7 @@
       "id": "1791781067291",
       "maskedPhone": "010-***-*477",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담대기",
       "createdAt": "2026-10-12T04:57:47.291Z"
     },
     {
@@ -127,5 +127,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "Af2MpV7OOviB//K2Pz0OmiIfix8DtWL3/Sj1kzUrYdZ3qzxIzEzVy7ZXhJgKVTumYcWyR+yQ41Sw3OPRDwVXqvMRrn0="
+  "writeKey": "HZWaDjOUekR8IMtzW7GLXV5Q4t3sHLBW2xO/aUr+zCiac+t/grQXmWnLL1JGSswaYw+1g6Qs1aldw48XoVtsQ1dNFTs="
 }
