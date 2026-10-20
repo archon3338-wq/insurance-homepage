@@ -89,6 +89,7 @@ export default function AdminStatusPage() {
   const [message, setMessage] = useState("내용을 고치면 자동으로 저장됩니다.");
   const [ok, setOk] = useState(true);
   const readyRef = useRef(false);
+  const authFailedRef = useRef(false);
 
   const fetchRemote = useCallback(async () => {
     const extraRaw = (() => {
@@ -137,16 +138,7 @@ export default function AdminStatusPage() {
   }, [fetchRemote]);
 
   useEffect(() => {
-    const stored = readStoredToken();
-    setToken(stored);
-    if (stored) {
-      void fetch("/api/admin/lead-status", {
-        method: "POST",
-        cache: "no-store",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ githubToken: stored }),
-      }).catch(() => {});
-    }
+    setToken(readStoredToken());
     loadItems().catch(() => {
       setOk(false);
       setMessage("접수현황을 불러오지 못했습니다.");
@@ -200,6 +192,16 @@ export default function AdminStatusPage() {
         items?: Array<{ id: string; maskedPhone: string }>;
       };
       if (!res.ok) {
+        const authFailed = /토큰|권한|저장소에 접근/.test(data.error || "");
+        if (authFailed) {
+          authFailedRef.current = true;
+          try {
+            window.localStorage.removeItem(LEAD_GITHUB_TOKEN_KEY);
+          } catch {
+            // 저장된 만료 토큰은 지우고 새로 붙여넣게 합니다.
+          }
+          setToken("");
+        }
         setOk(false);
         setMessage(data.error || "저장에 실패했습니다. 토큰을 다시 확인해 주세요.");
         return;
@@ -213,6 +215,7 @@ export default function AdminStatusPage() {
           })),
         );
       }
+      authFailedRef.current = false;
       setDirty(false);
       setOk(true);
       setMessage("저장했습니다. 홈을 새로고침하면 접수현황이 바뀝니다.");
@@ -225,7 +228,7 @@ export default function AdminStatusPage() {
   }, [fetchRemote, items, token]);
 
   useEffect(() => {
-    if (!readyRef.current || !dirty || !token.trim()) return;
+    if (!readyRef.current || !dirty || !token.trim() || authFailedRef.current) return;
     const timer = window.setTimeout(() => {
       void save();
     }, 800);
@@ -263,17 +266,23 @@ export default function AdminStatusPage() {
             <p>
               1. GitHub에서 <strong>archon3338-wq</strong> 계정으로 로그인한 다음,{" "}
               <a href={LEAD_GITHUB_TOKEN_URL} target="_blank" rel="noreferrer">
-                이 링크에서 Generate token
+                이 링크에서 Generate new token (classic)
               </a>
               을 누릅니다.
             </p>
-            <p>2. 나온 토큰을 붙여넣고, 지금 저장을 누릅니다. 이 컴퓨터에만 기억됩니다.</p>
+            <p>
+              2. Expiration은 <strong>No expiration</strong>으로 두고 Generate token을 누른 다음,
+              <strong>ghp_</strong>로 시작하는 값을 붙여넣고 지금 저장을 누릅니다.
+            </p>
             <input
               type="password"
               value={token}
-              placeholder="ghp_ 로 시작하는 토큰"
-              autoComplete="off"
-              onChange={(e) => setToken(e.target.value)}
+              placeholder="ghp_ 로 시작하는 새 토큰"
+              autoComplete="new-password"
+              onChange={(e) => {
+                authFailedRef.current = false;
+                setToken(e.target.value);
+              }}
             />
           </div>
 

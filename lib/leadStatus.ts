@@ -85,11 +85,30 @@ function githubHeaders(token?: string): HeadersInit {
 }
 
 function normalizeGithubToken(token: string) {
-  return token.trim().replace(/^Bearer\s+/i, "").replace(/^["']|["']$/g, "");
+  return token
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/^Bearer\s+/i, "")
+    .replace(/^token\s+/i, "")
+    .replace(/^["'\s]+|["'\s]+$/g, "")
+    .replace(/\s+/g, "");
+}
+
+function uniqueTokens(...values: Array<string | undefined>) {
+  const seen = new Set<string>();
+  const tokens: string[] = [];
+  for (const value of values) {
+    const token = normalizeGithubToken(value || "");
+    if (!token || seen.has(token)) continue;
+    seen.add(token);
+    tokens.push(token);
+  }
+  return tokens;
 }
 
 function githubWriteError(status: number, detail = "") {
-  if (status === 401) return "토큰이 올바르지 않습니다. Generate token에서 나온 값을 다시 복사해 붙여넣어 주세요.";
+  if (status === 401) {
+    return "토큰이 만료되었거나 잘못되었습니다. 아래 링크에서 새 토큰을 만든 뒤, ghp_ 로 시작하는 값만 붙여넣고 지금 저장을 눌러 주세요.";
+  }
   if (status === 403) return "토큰 권한이 없습니다. 토큰을 만들 때 repo 항목이 체크되어 있어야 합니다.";
   if (status === 404) return "저장소에 접근하지 못했습니다. GitHub에 로그인한 계정을 확인해 주세요.";
   if (status === 409) return "잠시 후 다시 지금 저장을 눌러 주세요.";
@@ -321,31 +340,38 @@ async function readStore(): Promise<Store> {
 }
 
 async function resolveWriteToken(store: Store, token?: string) {
-  const direct = normalizeGithubToken(token || githubToken() || (await loadCachedGithubToken()));
-  if (direct) return direct;
-  if (!store.writeKey) return "";
-  try {
-    const unlocked = decryptWriteToken(store.writeKey);
-    if (unlocked) await cacheGithubToken(unlocked);
-    return normalizeGithubToken(unlocked);
-  } catch {
-    return "";
-  }
+  const unlocked = await unlockStoreToken(store);
+  const tokens = uniqueTokens(token, githubToken(), await loadCachedGithubToken(), unlocked);
+  return tokens[0] || "";
 }
 
 async function writeStore(store: Store, token?: string) {
-  const writeToken = await resolveWriteToken(store, token);
+  const unlocked = await unlockStoreToken(store);
+  const candidates = uniqueTokens(token, githubToken(), await loadCachedGithubToken(), unlocked);
   const remoteOk = await writeRemoteStore(store).catch(() => false);
-  if (writeToken) {
-    await writeToGitHub(store, writeToken);
+
+  let lastError: Error | null = null;
+  for (const candidate of candidates) {
     try {
-      await writeLocalStore(store);
-    } catch {
-      // GitHub 저장이 됐으면 실제 사이트에는 반영됩니다.
+      const next: Store = {
+        ...store,
+        writeKey: encryptWriteToken(candidate),
+      };
+      await writeToGitHub(next, candidate);
+      await cacheGithubToken(candidate);
+      store.writeKey = next.writeKey;
+      try {
+        await writeLocalStore(next);
+      } catch {
+        // GitHub 저장이 됐으면 실제 사이트에는 반영됩니다.
+      }
+      await writeTmpStore(next);
+      return;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error("저장에 실패했습니다.");
     }
-    return;
   }
-  const githubOk = await writeToGitHub(store).catch(() => false);
+
   let localOk = false;
   try {
     await writeLocalStore(store);
@@ -354,9 +380,9 @@ async function writeStore(store: Store, token?: string) {
     localOk = false;
   }
 
-  if (remoteOk || githubOk) return;
+  if (remoteOk) return;
   if (localOk && !process.env.VERCEL) return;
-  throw new Error("GitHub 토큰을 입력하면 실제 사이트에 저장됩니다.");
+  throw lastError || new Error("GitHub 토큰을 입력하면 실제 사이트에 저장됩니다.");
 }
 
 export async function listLeadStatus() {
@@ -379,7 +405,6 @@ export async function addLeadStatus(phone: string, genderLabel: string, token?: 
   };
 
   const writeToken = normalizeGithubToken(token || "");
-  if (writeToken) await cacheGithubToken(writeToken);
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const store = await readStore();
@@ -424,24 +449,19 @@ export async function replaceLeadStatus(
   });
 
   const prev = await readStore();
-  const writeToken = normalizeGithubToken(token || "");
-  if (writeToken) await cacheGithubToken(writeToken);
   const store: Store = {
     items: next.sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-    writeKey: writeToken ? encryptWriteToken(writeToken) : prev.writeKey,
+    writeKey: prev.writeKey,
   };
   await writeTmpStore(store);
-  await writeStore(store, writeToken || undefined);
+  await writeStore(store, token);
   return store.items;
 }
 
 export async function rememberGithubWriteToken(token: string) {
   const writeToken = normalizeGithubToken(token);
   if (!writeToken) throw new Error("토큰이 없습니다.");
-  await cacheGithubToken(writeToken);
   const store = await readStore();
-  store.writeKey = encryptWriteToken(writeToken);
-  await writeTmpStore(store);
   await writeStore(store, writeToken);
   return true;
 }
