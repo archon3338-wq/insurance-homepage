@@ -231,7 +231,7 @@
           card.hidden = !show;
           card.classList.remove("slide-in-left", "slide-in-right", "slide-in-fade");
           if (show) {
-            var slide = shown % 3 === 0 ? "slide-in-left" : shown % 3 === 2 ? "slide-in-right" : "slide-in-fade";
+            var slide = shown % 4 === 0 ? "slide-in-left" : shown % 4 === 3 ? "slide-in-right" : "slide-in-fade";
             void card.offsetWidth;
             card.classList.add(slide);
             shown += 1;

@@ -75,7 +75,7 @@ export default function InfoBoard() {
         <div className="info-grid">
           {posts.map((post, index) => {
             const slide =
-              index % 3 === 0 ? "slide-in-left" : index % 3 === 2 ? "slide-in-right" : "slide-in-fade";
+              index % 4 === 0 ? "slide-in-left" : index % 4 === 3 ? "slide-in-right" : "slide-in-fade";
             const className = `info-card ${slide}`;
             const body = (
               <>
