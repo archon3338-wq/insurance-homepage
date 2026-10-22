@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import blogPosts from "../data/blog-posts.json";
 
 type Category = "전체" | "보상" | "정보";
 
@@ -14,19 +15,15 @@ type Post = {
   image?: string;
 };
 
-const INFO_BLOG = "https://blog.naver.com/punditclass/224398888400";
-
-const POSTS: Post[] = [
-  {
-    id: "1",
-    category: "정보",
-    title: "암 진단비 청구했는데, 거절?",
-    date: "2026-09-03",
-    tone: "green",
-    href: INFO_BLOG,
-    image: "/thumb-algi-bosang.jpg",
-  },
-];
+const POSTS: Post[] = blogPosts.map((post) => ({
+  id: post.id,
+  category: "보상",
+  title: post.title,
+  date: post.date,
+  tone: "green",
+  href: post.href,
+  image: post.image,
+}));
 
 const TABS: Category[] = ["전체", "보상", "정보"];
 
