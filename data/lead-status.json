@@ -11,28 +11,28 @@
       "id": "1793010850807",
       "maskedPhone": "010-***-*667",
       "gender": "남성",
-      "status": "상담대기",
+      "status": "상담중",
       "createdAt": "2026-10-26T10:34:10.807Z"
     },
     {
       "id": "1792825048595",
       "maskedPhone": "010-***-*574",
       "gender": "여성",
-      "status": "상담대기",
+      "status": "상담중",
       "createdAt": "2026-10-24T06:57:28.595Z"
     },
     {
       "id": "1792629032197",
       "maskedPhone": "010-***-*164",
       "gender": "여성",
-      "status": "상담중",
+      "status": "상담완료",
       "createdAt": "2026-10-22T00:30:32.197Z"
     },
     {
       "id": "1792465085918",
       "maskedPhone": "010-***-*523",
       "gender": "여성",
-      "status": "상담중",
+      "status": "상담완료",
       "createdAt": "2026-10-20T02:58:05.918Z"
     },
     {
@@ -169,5 +169,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "x2z+mvH9PN5AivkKeefYbNxME38lbBg6jxOcSWvAfDNEr9BvEJGKJDOPUXEJCLp/wJTezzMJS1rG7IMVpWK3QOX59Z4="
+  "writeKey": "7lOqqE3u6vMEcnH0QfHnhlOVoWyp5k4xYCPb2zSanj89vRAgWKNanTLituEGXUQwQxMjwsuS4axrQUY2u1hbVW7fH6s="
 }
