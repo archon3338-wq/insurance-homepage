@@ -11,7 +11,7 @@
       "id": "1793581170877",
       "maskedPhone": "010-***-*487",
       "gender": "여성",
-      "status": "상담대기",
+      "status": "상담중",
       "createdAt": "2026-11-02T00:59:30.877Z"
     },
     {
@@ -183,5 +183,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "k71QsEFPirl4MpdC7PD+bzv7P9RJ2R/p9gGL0bBOiMVhiKy54DoZdW08QgRg+QhFEnD266orgeKFQx7vTwO2NUnk6Qg="
+  "writeKey": "WtgaUwAb6Yi/c0YmIjoysfETdic71M0TApyJJqpH0XWYXKxIwBY7+f+G3WIBrDUnIoqhrxXZo/iBgX1hMAke3hBakeU="
 }
