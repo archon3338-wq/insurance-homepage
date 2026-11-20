@@ -4,21 +4,21 @@
       "id": "1794806407548",
       "maskedPhone": "010-***-*168",
       "gender": "여성",
-      "status": "접수완료",
+      "status": "상담중",
       "createdAt": "2026-11-16T05:20:07.548Z"
     },
     {
       "id": "1794132194788",
       "maskedPhone": "010-***-*521",
       "gender": "남성",
-      "status": "상담중",
+      "status": "상담완료",
       "createdAt": "2026-11-08T10:03:14.788Z"
     },
     {
       "id": "1793855005788",
       "maskedPhone": "010-***-*901",
       "gender": "여성",
-      "status": "상담중",
+      "status": "상담완료",
       "createdAt": "2026-11-05T05:03:25.788Z"
     },
     {
@@ -197,5 +197,5 @@
       "createdAt": "2026-09-02T02:31:00.000Z"
     }
   ],
-  "writeKey": "YFVwSTR00/T6kDWkNqu4mzk0bR+en5Qvp5iRsoL2CCzCbuLR4p2NZuy9K2FqJ0vRm8sgJRrXzG+nildi4uYuU8J3BOc="
+  "writeKey": "39mpMEs4T+4YPDQj3IxNyK/rkx9u2PoVk4Dp1HoJ/2CMHrGGI7OfTV/mVtUaDTL+9HdgpRx/MU25ifUcqsG7ceJzWIM="
 }
